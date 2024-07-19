@@ -1,0 +1,36 @@
+services:
+  dev:
+    image: ko.local/incident-api:devenv
+    hostname: $HOSTNAME
+    pid: "host"
+    ports:
+      - 80:80
+    volumes:
+      - ./config:/etc/incident
+    environment:
+      TZ: Asia/Seoul
+    depends_on:
+      database:
+        condition: service_healthy
+  database:
+    image: postgis/postgis:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: application
+      TZ: Asia/Seoul
+    expose:
+      - 5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 1s
+      timeout: 5s
+      retries: 5
+  admin:
+    image: dpage/pgadmin4:latest
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@localhost.io
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_LISTEN_PORT: 80
+    ports:
+      - 8000:80

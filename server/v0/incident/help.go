@@ -1,6 +1,7 @@
 package incident
 
 import (
+	"fmt"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -100,7 +101,7 @@ func (i *Incident) QueryHelp(ctx *fiber.Ctx) error {
 	} else {
 		// use postgis function to calculate distance
 		qb = qb.Where(func(selector *sql.Selector) {
-			selector.Where(sql.ExprP("ST_DWithin(location, 'POINT(?, ?)', ?)", req.Longitude, req.Latitude, req.Radius))
+			selector.Where(sql.ExprP(fmt.Sprintf("ST_DWithin(location, 'POINT(%f %f)', %d)", req.Longitude, req.Latitude, req.Radius)))
 		})
 	}
 

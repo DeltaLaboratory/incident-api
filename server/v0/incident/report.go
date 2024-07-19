@@ -172,7 +172,7 @@ func (i *Incident) Query(ctx *fiber.Ctx) error {
 		qb = qb.Where(incident.ID(*req.IncidentID))
 	} else {
 		qb = qb.Where(func(selector *sql.Selector) {
-			selector.Where(sql.ExprP("ST_DWithin(location, 'POINT(?, ?)', ?)", req.Longitude, req.Latitude, req.Radius))
+			selector.Where(sql.ExprP(fmt.Sprintf("ST_DWithin(location, 'POINT(%f %f)', %d)", req.Longitude, req.Latitude, req.Radius)))
 		})
 	}
 
