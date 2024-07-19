@@ -150,7 +150,7 @@ func (ic *IncidentCreate) defaults() {
 		ic.mutation.SetVote(v)
 	}
 	if _, ok := ic.mutation.VoteFilter(); !ok {
-		v := incident.DefaultVoteFilter
+		v := incident.DefaultVoteFilter()
 		ic.mutation.SetVoteFilter(v)
 	}
 	if _, ok := ic.mutation.CreatedAt(); !ok {

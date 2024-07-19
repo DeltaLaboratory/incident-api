@@ -38,7 +38,7 @@ func init() {
 	// incidentDescVoteFilter is the schema descriptor for vote_filter field.
 	incidentDescVoteFilter := incidentFields[8].Descriptor()
 	// incident.DefaultVoteFilter holds the default value on creation for the vote_filter field.
-	incident.DefaultVoteFilter = incidentDescVoteFilter.Default.([]byte)
+	incident.DefaultVoteFilter = incidentDescVoteFilter.Default.(func() []byte)
 	// incidentDescCreatedAt is the schema descriptor for created_at field.
 	incidentDescCreatedAt := incidentFields[9].Descriptor()
 	// incident.DefaultCreatedAt holds the default value on creation for the created_at field.

@@ -66,7 +66,7 @@ var (
 	// DefaultVote holds the default value on creation for the "vote" field.
 	DefaultVote int
 	// DefaultVoteFilter holds the default value on creation for the "vote_filter" field.
-	DefaultVoteFilter []byte
+	DefaultVoteFilter func() []byte
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultID holds the default value on creation for the "id" field.

@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"bytes"
 	"database/sql/driver"
 	"encoding/binary"
 	"encoding/json"
@@ -11,6 +12,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/schema/field"
+	"github.com/bits-and-blooms/bloom/v3"
 	"github.com/google/uuid"
 	"github.com/twpayne/go-geom/encoding/ewkbhex"
 	"github.com/twpayne/go-geom/encoding/geojson"
@@ -39,7 +41,12 @@ func (Incident) Fields() []ent.Field {
 		field.Bytes("image").Nillable().Default(nil),
 
 		field.Int("vote").Default(0),
-		field.Bytes("vote_filter").Nillable().Default(nil),
+		field.Bytes("vote_filter").Nillable().DefaultFunc(func() []byte {
+			var buf bytes.Buffer
+			b := bloom.New(1000000, 5)
+			_, _ = b.WriteTo(&buf)
+			return buf.Bytes()
+		}),
 
 		field.Time("created_at").Default(time.Now),
 	}
