@@ -256,6 +256,7 @@ func (i *Incident) QueryImage(ctx *fiber.Ctx) error {
 		})
 	}
 
+	ctx.Set("Content-Type", "image/jpeg")
 	return ctx.Send(*inc.Image)
 }
 
