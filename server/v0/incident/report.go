@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/bits-and-blooms/bloom/v3"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/twpayne/go-geom"
@@ -210,6 +211,8 @@ func (i *Incident) Query(ctx *fiber.Ctx) error {
 			CreatedAt:   inc.CreatedAt,
 		}
 	}
+
+	spew.Dump(response)
 
 	return ctx.JSON(response)
 }
