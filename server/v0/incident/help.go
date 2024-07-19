@@ -100,7 +100,7 @@ func (i *Incident) QueryHelp(ctx *fiber.Ctx) error {
 	} else {
 		// use postgis function to calculate distance
 		qb = qb.Where(func(selector *sql.Selector) {
-			selector.Where(sql.ExprP("ST_DWithin(location, ST_MakePoint(?, ?)::geography, ?)", req.Longitude, req.Latitude, req.Radius))
+			selector.Where(sql.ExprP("ST_DWithin(location, 'POINT(?, ?), ?)", req.Longitude, req.Latitude, req.Radius))
 		})
 	}
 
