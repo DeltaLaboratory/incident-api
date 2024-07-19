@@ -23,6 +23,7 @@ func (s *Server) ConnectDB() error {
 
 	drv := entsql.OpenDB(dialect.Postgres, db)
 	s.db = ent.NewClient(ent.Driver(drv))
+	s.db = s.db.Debug()
 
 	if !fiber.IsChild() {
 		if err := s.db.Schema.Create(context.TODO(),
