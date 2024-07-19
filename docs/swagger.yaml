@@ -1,0 +1,308 @@
+basePath: /v0
+definitions:
+  common.ErrorResponse:
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+    type: object
+  incident.DeleteReportRequest:
+    properties:
+      incident_id:
+        type: string
+      user_id:
+        type: string
+      user_key:
+        type: string
+    type: object
+  incident.HelpRequest:
+    properties:
+      blood_pressure:
+        type: integer
+      body_temperature:
+        type: integer
+      description:
+        type: string
+      heart_rate:
+        type: integer
+      idempotency_key:
+        type: string
+      latitude:
+        type: number
+      longitude:
+        type: number
+      user_id:
+        type: string
+    type: object
+  incident.QueryHelpRequest:
+    properties:
+      help_id:
+        type: string
+      latitude:
+        type: number
+      longitude:
+        type: number
+      radius:
+        description: Radius in meters
+        type: integer
+    type: object
+  incident.QueryHelpResponse:
+    properties:
+      blood_pressure:
+        type: integer
+      body_temperature:
+        type: integer
+      created_at:
+        type: string
+      description:
+        type: string
+      heart_rate:
+        type: integer
+      latitude:
+        type: number
+      longitude:
+        type: number
+      reporter:
+        type: string
+    type: object
+  incident.QueryRequest:
+    properties:
+      incident_id:
+        type: string
+      latitude:
+        type: number
+      longitude:
+        type: number
+      radius:
+        description: Radius in meters
+        type: integer
+    type: object
+  incident.QueryResponse:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      incident_id:
+        type: string
+      latitude:
+        type: number
+      longitude:
+        type: number
+      reporter:
+        type: string
+      type:
+        type: string
+    type: object
+  incident.ReportRequest:
+    properties:
+      description:
+        type: string
+      image:
+        description: Base64 encoded jpeg image
+        type: string
+      latitude:
+        type: number
+      longitude:
+        type: number
+      type:
+        type: string
+      user_id:
+        description: user id in uuid format
+        type: string
+      user_key:
+        description: 32 byte ascii string
+        type: string
+    type: object
+  incident.ReportResponse:
+    properties:
+      incident_id:
+        type: string
+    type: object
+host: incident.deltalab.dev
+info:
+  contact: {}
+  description: This is the Incident API server.
+  title: Incident API
+  version: 0.1.0
+paths:
+  /incident/help:
+    post:
+      consumes:
+      - application/json
+      description: Help
+      parameters:
+      - description: Help request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/incident.HelpRequest'
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+      summary: Help
+      tags:
+      - Incident
+  /incident/help/query:
+    post:
+      consumes:
+      - application/json
+      description: Query help
+      parameters:
+      - description: Query help request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/incident.QueryHelpRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/incident.QueryHelpResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+      summary: Query help
+      tags:
+      - Incident
+  /incident/image/{incident_id}:
+    get:
+      description: Query incident image
+      parameters:
+      - description: Incident ID
+        in: path
+        name: incident_id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+      summary: Query incident image
+      tags:
+      - Incident
+  /incident/query:
+    post:
+      consumes:
+      - application/json
+      description: Query incidents
+      parameters:
+      - description: Query request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/incident.QueryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/incident.QueryResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+      summary: Query incidents
+      tags:
+      - Incident
+  /incident/report:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an incident report
+      parameters:
+      - description: Delete report request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/incident.DeleteReportRequest'
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+      summary: Delete an incident report
+      tags:
+      - Incident
+    post:
+      consumes:
+      - application/json
+      description: Report an incident
+      parameters:
+      - description: Report request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/incident.ReportRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/incident.ReportResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+      summary: Report an incident
+      tags:
+      - Incident
+schemes:
+- https
+swagger: "2.0"
