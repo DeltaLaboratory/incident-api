@@ -141,9 +141,17 @@ func (ic *IncidentCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (ic *IncidentCreate) defaults() {
+	if _, ok := ic.mutation.Image(); !ok {
+		v := incident.DefaultImage
+		ic.mutation.SetImage(v)
+	}
 	if _, ok := ic.mutation.Vote(); !ok {
 		v := incident.DefaultVote
 		ic.mutation.SetVote(v)
+	}
+	if _, ok := ic.mutation.VoteFilter(); !ok {
+		v := incident.DefaultVoteFilter
+		ic.mutation.SetVoteFilter(v)
 	}
 	if _, ok := ic.mutation.CreatedAt(); !ok {
 		v := incident.DefaultCreatedAt()

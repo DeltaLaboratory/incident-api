@@ -61,8 +61,12 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// DefaultImage holds the default value on creation for the "image" field.
+	DefaultImage []byte
 	// DefaultVote holds the default value on creation for the "vote" field.
 	DefaultVote int
+	// DefaultVoteFilter holds the default value on creation for the "vote_filter" field.
+	DefaultVoteFilter []byte
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultID holds the default value on creation for the "id" field.
