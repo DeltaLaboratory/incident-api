@@ -23,10 +23,8 @@ type Help struct {
 	IdempotencyKey string `json:"idempotency_key,omitempty"`
 	// Reporter holds the value of the "reporter" field.
 	Reporter uuid.UUID `json:"reporter,omitempty"`
-	// Latitude holds the value of the "latitude" field.
-	Latitude schema.Coordinate `json:"latitude,omitempty"`
-	// Longitude holds the value of the "longitude" field.
-	Longitude schema.Coordinate `json:"longitude,omitempty"`
+	// Location holds the value of the "location" field.
+	Location *schema.GeoJson `json:"location,omitempty"`
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
 	// HeartRate holds the value of the "heart_rate" field.
@@ -45,8 +43,8 @@ func (*Help) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case help.FieldLatitude, help.FieldLongitude:
-			values[i] = new(sql.NullFloat64)
+		case help.FieldLocation:
+			values[i] = new(schema.GeoJson)
 		case help.FieldHeartRate, help.FieldBloodPressure, help.FieldBodyTemperature:
 			values[i] = new(sql.NullInt64)
 		case help.FieldIdempotencyKey, help.FieldDescription:
@@ -88,17 +86,11 @@ func (h *Help) assignValues(columns []string, values []any) error {
 			} else if value != nil {
 				h.Reporter = *value
 			}
-		case help.FieldLatitude:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
-				return fmt.Errorf("unexpected type %T for field latitude", values[i])
-			} else if value.Valid {
-				h.Latitude = schema.Coordinate(value.Float64)
-			}
-		case help.FieldLongitude:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
-				return fmt.Errorf("unexpected type %T for field longitude", values[i])
-			} else if value.Valid {
-				h.Longitude = schema.Coordinate(value.Float64)
+		case help.FieldLocation:
+			if value, ok := values[i].(*schema.GeoJson); !ok {
+				return fmt.Errorf("unexpected type %T for field location", values[i])
+			} else if value != nil {
+				h.Location = value
 			}
 		case help.FieldDescription:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -175,11 +167,8 @@ func (h *Help) String() string {
 	builder.WriteString("reporter=")
 	builder.WriteString(fmt.Sprintf("%v", h.Reporter))
 	builder.WriteString(", ")
-	builder.WriteString("latitude=")
-	builder.WriteString(fmt.Sprintf("%v", h.Latitude))
-	builder.WriteString(", ")
-	builder.WriteString("longitude=")
-	builder.WriteString(fmt.Sprintf("%v", h.Longitude))
+	builder.WriteString("location=")
+	builder.WriteString(fmt.Sprintf("%v", h.Location))
 	builder.WriteString(", ")
 	builder.WriteString("description=")
 	builder.WriteString(h.Description)

@@ -23,10 +23,8 @@ type Incident struct {
 	IdempotencyKey string `json:"idempotency_key,omitempty"`
 	// Reporter holds the value of the "reporter" field.
 	Reporter uuid.UUID `json:"reporter,omitempty"`
-	// Latitude holds the value of the "latitude" field.
-	Latitude schema.Coordinate `json:"latitude,omitempty"`
-	// Longitude holds the value of the "longitude" field.
-	Longitude schema.Coordinate `json:"longitude,omitempty"`
+	// Location holds the value of the "location" field.
+	Location *schema.GeoJson `json:"location,omitempty"`
 	// Type holds the value of the "type" field.
 	Type string `json:"type,omitempty"`
 	// Description holds the value of the "description" field.
@@ -45,8 +43,8 @@ func (*Incident) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case incident.FieldImage:
 			values[i] = new([]byte)
-		case incident.FieldLatitude, incident.FieldLongitude:
-			values[i] = new(sql.NullFloat64)
+		case incident.FieldLocation:
+			values[i] = new(schema.GeoJson)
 		case incident.FieldIdempotencyKey, incident.FieldType, incident.FieldDescription:
 			values[i] = new(sql.NullString)
 		case incident.FieldCreatedAt:
@@ -86,17 +84,11 @@ func (i *Incident) assignValues(columns []string, values []any) error {
 			} else if value != nil {
 				i.Reporter = *value
 			}
-		case incident.FieldLatitude:
-			if value, ok := values[j].(*sql.NullFloat64); !ok {
-				return fmt.Errorf("unexpected type %T for field latitude", values[j])
-			} else if value.Valid {
-				i.Latitude = schema.Coordinate(value.Float64)
-			}
-		case incident.FieldLongitude:
-			if value, ok := values[j].(*sql.NullFloat64); !ok {
-				return fmt.Errorf("unexpected type %T for field longitude", values[j])
-			} else if value.Valid {
-				i.Longitude = schema.Coordinate(value.Float64)
+		case incident.FieldLocation:
+			if value, ok := values[j].(*schema.GeoJson); !ok {
+				return fmt.Errorf("unexpected type %T for field location", values[j])
+			} else if value != nil {
+				i.Location = value
 			}
 		case incident.FieldType:
 			if value, ok := values[j].(*sql.NullString); !ok {
@@ -164,11 +156,8 @@ func (i *Incident) String() string {
 	builder.WriteString("reporter=")
 	builder.WriteString(fmt.Sprintf("%v", i.Reporter))
 	builder.WriteString(", ")
-	builder.WriteString("latitude=")
-	builder.WriteString(fmt.Sprintf("%v", i.Latitude))
-	builder.WriteString(", ")
-	builder.WriteString("longitude=")
-	builder.WriteString(fmt.Sprintf("%v", i.Longitude))
+	builder.WriteString("location=")
+	builder.WriteString(fmt.Sprintf("%v", i.Location))
 	builder.WriteString(", ")
 	builder.WriteString("type=")
 	builder.WriteString(i.Type)

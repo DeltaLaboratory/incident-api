@@ -58,45 +58,15 @@ func (iu *IncidentUpdate) SetNillableReporter(u *uuid.UUID) *IncidentUpdate {
 	return iu
 }
 
-// SetLatitude sets the "latitude" field.
-func (iu *IncidentUpdate) SetLatitude(s schema.Coordinate) *IncidentUpdate {
-	iu.mutation.ResetLatitude()
-	iu.mutation.SetLatitude(s)
+// SetLocation sets the "location" field.
+func (iu *IncidentUpdate) SetLocation(sj *schema.GeoJson) *IncidentUpdate {
+	iu.mutation.SetLocation(sj)
 	return iu
 }
 
-// SetNillableLatitude sets the "latitude" field if the given value is not nil.
-func (iu *IncidentUpdate) SetNillableLatitude(s *schema.Coordinate) *IncidentUpdate {
-	if s != nil {
-		iu.SetLatitude(*s)
-	}
-	return iu
-}
-
-// AddLatitude adds s to the "latitude" field.
-func (iu *IncidentUpdate) AddLatitude(s schema.Coordinate) *IncidentUpdate {
-	iu.mutation.AddLatitude(s)
-	return iu
-}
-
-// SetLongitude sets the "longitude" field.
-func (iu *IncidentUpdate) SetLongitude(s schema.Coordinate) *IncidentUpdate {
-	iu.mutation.ResetLongitude()
-	iu.mutation.SetLongitude(s)
-	return iu
-}
-
-// SetNillableLongitude sets the "longitude" field if the given value is not nil.
-func (iu *IncidentUpdate) SetNillableLongitude(s *schema.Coordinate) *IncidentUpdate {
-	if s != nil {
-		iu.SetLongitude(*s)
-	}
-	return iu
-}
-
-// AddLongitude adds s to the "longitude" field.
-func (iu *IncidentUpdate) AddLongitude(s schema.Coordinate) *IncidentUpdate {
-	iu.mutation.AddLongitude(s)
+// ClearLocation clears the value of the "location" field.
+func (iu *IncidentUpdate) ClearLocation() *IncidentUpdate {
+	iu.mutation.ClearLocation()
 	return iu
 }
 
@@ -195,17 +165,11 @@ func (iu *IncidentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := iu.mutation.Reporter(); ok {
 		_spec.SetField(incident.FieldReporter, field.TypeUUID, value)
 	}
-	if value, ok := iu.mutation.Latitude(); ok {
-		_spec.SetField(incident.FieldLatitude, field.TypeFloat64, value)
+	if value, ok := iu.mutation.Location(); ok {
+		_spec.SetField(incident.FieldLocation, field.TypeOther, value)
 	}
-	if value, ok := iu.mutation.AddedLatitude(); ok {
-		_spec.AddField(incident.FieldLatitude, field.TypeFloat64, value)
-	}
-	if value, ok := iu.mutation.Longitude(); ok {
-		_spec.SetField(incident.FieldLongitude, field.TypeFloat64, value)
-	}
-	if value, ok := iu.mutation.AddedLongitude(); ok {
-		_spec.AddField(incident.FieldLongitude, field.TypeFloat64, value)
+	if iu.mutation.LocationCleared() {
+		_spec.ClearField(incident.FieldLocation, field.TypeOther)
 	}
 	if value, ok := iu.mutation.GetType(); ok {
 		_spec.SetField(incident.FieldType, field.TypeString, value)
@@ -267,45 +231,15 @@ func (iuo *IncidentUpdateOne) SetNillableReporter(u *uuid.UUID) *IncidentUpdateO
 	return iuo
 }
 
-// SetLatitude sets the "latitude" field.
-func (iuo *IncidentUpdateOne) SetLatitude(s schema.Coordinate) *IncidentUpdateOne {
-	iuo.mutation.ResetLatitude()
-	iuo.mutation.SetLatitude(s)
+// SetLocation sets the "location" field.
+func (iuo *IncidentUpdateOne) SetLocation(sj *schema.GeoJson) *IncidentUpdateOne {
+	iuo.mutation.SetLocation(sj)
 	return iuo
 }
 
-// SetNillableLatitude sets the "latitude" field if the given value is not nil.
-func (iuo *IncidentUpdateOne) SetNillableLatitude(s *schema.Coordinate) *IncidentUpdateOne {
-	if s != nil {
-		iuo.SetLatitude(*s)
-	}
-	return iuo
-}
-
-// AddLatitude adds s to the "latitude" field.
-func (iuo *IncidentUpdateOne) AddLatitude(s schema.Coordinate) *IncidentUpdateOne {
-	iuo.mutation.AddLatitude(s)
-	return iuo
-}
-
-// SetLongitude sets the "longitude" field.
-func (iuo *IncidentUpdateOne) SetLongitude(s schema.Coordinate) *IncidentUpdateOne {
-	iuo.mutation.ResetLongitude()
-	iuo.mutation.SetLongitude(s)
-	return iuo
-}
-
-// SetNillableLongitude sets the "longitude" field if the given value is not nil.
-func (iuo *IncidentUpdateOne) SetNillableLongitude(s *schema.Coordinate) *IncidentUpdateOne {
-	if s != nil {
-		iuo.SetLongitude(*s)
-	}
-	return iuo
-}
-
-// AddLongitude adds s to the "longitude" field.
-func (iuo *IncidentUpdateOne) AddLongitude(s schema.Coordinate) *IncidentUpdateOne {
-	iuo.mutation.AddLongitude(s)
+// ClearLocation clears the value of the "location" field.
+func (iuo *IncidentUpdateOne) ClearLocation() *IncidentUpdateOne {
+	iuo.mutation.ClearLocation()
 	return iuo
 }
 
@@ -434,17 +368,11 @@ func (iuo *IncidentUpdateOne) sqlSave(ctx context.Context) (_node *Incident, err
 	if value, ok := iuo.mutation.Reporter(); ok {
 		_spec.SetField(incident.FieldReporter, field.TypeUUID, value)
 	}
-	if value, ok := iuo.mutation.Latitude(); ok {
-		_spec.SetField(incident.FieldLatitude, field.TypeFloat64, value)
+	if value, ok := iuo.mutation.Location(); ok {
+		_spec.SetField(incident.FieldLocation, field.TypeOther, value)
 	}
-	if value, ok := iuo.mutation.AddedLatitude(); ok {
-		_spec.AddField(incident.FieldLatitude, field.TypeFloat64, value)
-	}
-	if value, ok := iuo.mutation.Longitude(); ok {
-		_spec.SetField(incident.FieldLongitude, field.TypeFloat64, value)
-	}
-	if value, ok := iuo.mutation.AddedLongitude(); ok {
-		_spec.AddField(incident.FieldLongitude, field.TypeFloat64, value)
+	if iuo.mutation.LocationCleared() {
+		_spec.ClearField(incident.FieldLocation, field.TypeOther)
 	}
 	if value, ok := iuo.mutation.GetType(); ok {
 		_spec.SetField(incident.FieldType, field.TypeString, value)

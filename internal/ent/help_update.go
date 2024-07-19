@@ -58,45 +58,15 @@ func (hu *HelpUpdate) SetNillableReporter(u *uuid.UUID) *HelpUpdate {
 	return hu
 }
 
-// SetLatitude sets the "latitude" field.
-func (hu *HelpUpdate) SetLatitude(s schema.Coordinate) *HelpUpdate {
-	hu.mutation.ResetLatitude()
-	hu.mutation.SetLatitude(s)
+// SetLocation sets the "location" field.
+func (hu *HelpUpdate) SetLocation(sj *schema.GeoJson) *HelpUpdate {
+	hu.mutation.SetLocation(sj)
 	return hu
 }
 
-// SetNillableLatitude sets the "latitude" field if the given value is not nil.
-func (hu *HelpUpdate) SetNillableLatitude(s *schema.Coordinate) *HelpUpdate {
-	if s != nil {
-		hu.SetLatitude(*s)
-	}
-	return hu
-}
-
-// AddLatitude adds s to the "latitude" field.
-func (hu *HelpUpdate) AddLatitude(s schema.Coordinate) *HelpUpdate {
-	hu.mutation.AddLatitude(s)
-	return hu
-}
-
-// SetLongitude sets the "longitude" field.
-func (hu *HelpUpdate) SetLongitude(s schema.Coordinate) *HelpUpdate {
-	hu.mutation.ResetLongitude()
-	hu.mutation.SetLongitude(s)
-	return hu
-}
-
-// SetNillableLongitude sets the "longitude" field if the given value is not nil.
-func (hu *HelpUpdate) SetNillableLongitude(s *schema.Coordinate) *HelpUpdate {
-	if s != nil {
-		hu.SetLongitude(*s)
-	}
-	return hu
-}
-
-// AddLongitude adds s to the "longitude" field.
-func (hu *HelpUpdate) AddLongitude(s schema.Coordinate) *HelpUpdate {
-	hu.mutation.AddLongitude(s)
+// ClearLocation clears the value of the "location" field.
+func (hu *HelpUpdate) ClearLocation() *HelpUpdate {
+	hu.mutation.ClearLocation()
 	return hu
 }
 
@@ -238,17 +208,11 @@ func (hu *HelpUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := hu.mutation.Reporter(); ok {
 		_spec.SetField(help.FieldReporter, field.TypeUUID, value)
 	}
-	if value, ok := hu.mutation.Latitude(); ok {
-		_spec.SetField(help.FieldLatitude, field.TypeFloat64, value)
+	if value, ok := hu.mutation.Location(); ok {
+		_spec.SetField(help.FieldLocation, field.TypeOther, value)
 	}
-	if value, ok := hu.mutation.AddedLatitude(); ok {
-		_spec.AddField(help.FieldLatitude, field.TypeFloat64, value)
-	}
-	if value, ok := hu.mutation.Longitude(); ok {
-		_spec.SetField(help.FieldLongitude, field.TypeFloat64, value)
-	}
-	if value, ok := hu.mutation.AddedLongitude(); ok {
-		_spec.AddField(help.FieldLongitude, field.TypeFloat64, value)
+	if hu.mutation.LocationCleared() {
+		_spec.ClearField(help.FieldLocation, field.TypeOther)
 	}
 	if value, ok := hu.mutation.Description(); ok {
 		_spec.SetField(help.FieldDescription, field.TypeString, value)
@@ -322,45 +286,15 @@ func (huo *HelpUpdateOne) SetNillableReporter(u *uuid.UUID) *HelpUpdateOne {
 	return huo
 }
 
-// SetLatitude sets the "latitude" field.
-func (huo *HelpUpdateOne) SetLatitude(s schema.Coordinate) *HelpUpdateOne {
-	huo.mutation.ResetLatitude()
-	huo.mutation.SetLatitude(s)
+// SetLocation sets the "location" field.
+func (huo *HelpUpdateOne) SetLocation(sj *schema.GeoJson) *HelpUpdateOne {
+	huo.mutation.SetLocation(sj)
 	return huo
 }
 
-// SetNillableLatitude sets the "latitude" field if the given value is not nil.
-func (huo *HelpUpdateOne) SetNillableLatitude(s *schema.Coordinate) *HelpUpdateOne {
-	if s != nil {
-		huo.SetLatitude(*s)
-	}
-	return huo
-}
-
-// AddLatitude adds s to the "latitude" field.
-func (huo *HelpUpdateOne) AddLatitude(s schema.Coordinate) *HelpUpdateOne {
-	huo.mutation.AddLatitude(s)
-	return huo
-}
-
-// SetLongitude sets the "longitude" field.
-func (huo *HelpUpdateOne) SetLongitude(s schema.Coordinate) *HelpUpdateOne {
-	huo.mutation.ResetLongitude()
-	huo.mutation.SetLongitude(s)
-	return huo
-}
-
-// SetNillableLongitude sets the "longitude" field if the given value is not nil.
-func (huo *HelpUpdateOne) SetNillableLongitude(s *schema.Coordinate) *HelpUpdateOne {
-	if s != nil {
-		huo.SetLongitude(*s)
-	}
-	return huo
-}
-
-// AddLongitude adds s to the "longitude" field.
-func (huo *HelpUpdateOne) AddLongitude(s schema.Coordinate) *HelpUpdateOne {
-	huo.mutation.AddLongitude(s)
+// ClearLocation clears the value of the "location" field.
+func (huo *HelpUpdateOne) ClearLocation() *HelpUpdateOne {
+	huo.mutation.ClearLocation()
 	return huo
 }
 
@@ -532,17 +466,11 @@ func (huo *HelpUpdateOne) sqlSave(ctx context.Context) (_node *Help, err error) 
 	if value, ok := huo.mutation.Reporter(); ok {
 		_spec.SetField(help.FieldReporter, field.TypeUUID, value)
 	}
-	if value, ok := huo.mutation.Latitude(); ok {
-		_spec.SetField(help.FieldLatitude, field.TypeFloat64, value)
+	if value, ok := huo.mutation.Location(); ok {
+		_spec.SetField(help.FieldLocation, field.TypeOther, value)
 	}
-	if value, ok := huo.mutation.AddedLatitude(); ok {
-		_spec.AddField(help.FieldLatitude, field.TypeFloat64, value)
-	}
-	if value, ok := huo.mutation.Longitude(); ok {
-		_spec.SetField(help.FieldLongitude, field.TypeFloat64, value)
-	}
-	if value, ok := huo.mutation.AddedLongitude(); ok {
-		_spec.AddField(help.FieldLongitude, field.TypeFloat64, value)
+	if huo.mutation.LocationCleared() {
+		_spec.ClearField(help.FieldLocation, field.TypeOther)
 	}
 	if value, ok := huo.mutation.Description(); ok {
 		_spec.SetField(help.FieldDescription, field.TypeString, value)

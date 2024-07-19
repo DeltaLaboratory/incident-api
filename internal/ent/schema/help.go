@@ -21,8 +21,10 @@ func (Help) Fields() []ent.Field {
 		field.String("idempotency_key").Unique(),
 
 		field.UUID("reporter", uuid.Nil),
-		field.Float("latitude").GoType(Coordinate(0)).SchemaType(map[string]string{dialect.Postgres: "numeric"}),
-		field.Float("longitude").GoType(Coordinate(0)).SchemaType(map[string]string{dialect.Postgres: "numeric"}),
+		field.Other("location", &GeoJson{}).
+			SchemaType(map[string]string{
+				dialect.Postgres: "geometry(point, 4326)",
+			}).StorageKey("location").Optional(),
 		field.String("description"),
 
 		field.Int("heart_rate").Nillable(),

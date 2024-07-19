@@ -39,10 +39,7 @@ type HelpMutation struct {
 	id                  *uuid.UUID
 	idempotency_key     *string
 	reporter            *uuid.UUID
-	latitude            *schema.Coordinate
-	addlatitude         *schema.Coordinate
-	longitude           *schema.Coordinate
-	addlongitude        *schema.Coordinate
+	location            **schema.GeoJson
 	description         *string
 	heart_rate          *int
 	addheart_rate       *int
@@ -233,116 +230,53 @@ func (m *HelpMutation) ResetReporter() {
 	m.reporter = nil
 }
 
-// SetLatitude sets the "latitude" field.
-func (m *HelpMutation) SetLatitude(s schema.Coordinate) {
-	m.latitude = &s
-	m.addlatitude = nil
+// SetLocation sets the "location" field.
+func (m *HelpMutation) SetLocation(sj *schema.GeoJson) {
+	m.location = &sj
 }
 
-// Latitude returns the value of the "latitude" field in the mutation.
-func (m *HelpMutation) Latitude() (r schema.Coordinate, exists bool) {
-	v := m.latitude
+// Location returns the value of the "location" field in the mutation.
+func (m *HelpMutation) Location() (r *schema.GeoJson, exists bool) {
+	v := m.location
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldLatitude returns the old "latitude" field's value of the Help entity.
+// OldLocation returns the old "location" field's value of the Help entity.
 // If the Help object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *HelpMutation) OldLatitude(ctx context.Context) (v schema.Coordinate, err error) {
+func (m *HelpMutation) OldLocation(ctx context.Context) (v *schema.GeoJson, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldLatitude is only allowed on UpdateOne operations")
+		return v, errors.New("OldLocation is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldLatitude requires an ID field in the mutation")
+		return v, errors.New("OldLocation requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldLatitude: %w", err)
+		return v, fmt.Errorf("querying old value for OldLocation: %w", err)
 	}
-	return oldValue.Latitude, nil
+	return oldValue.Location, nil
 }
 
-// AddLatitude adds s to the "latitude" field.
-func (m *HelpMutation) AddLatitude(s schema.Coordinate) {
-	if m.addlatitude != nil {
-		*m.addlatitude += s
-	} else {
-		m.addlatitude = &s
-	}
+// ClearLocation clears the value of the "location" field.
+func (m *HelpMutation) ClearLocation() {
+	m.location = nil
+	m.clearedFields[help.FieldLocation] = struct{}{}
 }
 
-// AddedLatitude returns the value that was added to the "latitude" field in this mutation.
-func (m *HelpMutation) AddedLatitude() (r schema.Coordinate, exists bool) {
-	v := m.addlatitude
-	if v == nil {
-		return
-	}
-	return *v, true
+// LocationCleared returns if the "location" field was cleared in this mutation.
+func (m *HelpMutation) LocationCleared() bool {
+	_, ok := m.clearedFields[help.FieldLocation]
+	return ok
 }
 
-// ResetLatitude resets all changes to the "latitude" field.
-func (m *HelpMutation) ResetLatitude() {
-	m.latitude = nil
-	m.addlatitude = nil
-}
-
-// SetLongitude sets the "longitude" field.
-func (m *HelpMutation) SetLongitude(s schema.Coordinate) {
-	m.longitude = &s
-	m.addlongitude = nil
-}
-
-// Longitude returns the value of the "longitude" field in the mutation.
-func (m *HelpMutation) Longitude() (r schema.Coordinate, exists bool) {
-	v := m.longitude
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldLongitude returns the old "longitude" field's value of the Help entity.
-// If the Help object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *HelpMutation) OldLongitude(ctx context.Context) (v schema.Coordinate, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldLongitude is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldLongitude requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldLongitude: %w", err)
-	}
-	return oldValue.Longitude, nil
-}
-
-// AddLongitude adds s to the "longitude" field.
-func (m *HelpMutation) AddLongitude(s schema.Coordinate) {
-	if m.addlongitude != nil {
-		*m.addlongitude += s
-	} else {
-		m.addlongitude = &s
-	}
-}
-
-// AddedLongitude returns the value that was added to the "longitude" field in this mutation.
-func (m *HelpMutation) AddedLongitude() (r schema.Coordinate, exists bool) {
-	v := m.addlongitude
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetLongitude resets all changes to the "longitude" field.
-func (m *HelpMutation) ResetLongitude() {
-	m.longitude = nil
-	m.addlongitude = nil
+// ResetLocation resets all changes to the "location" field.
+func (m *HelpMutation) ResetLocation() {
+	m.location = nil
+	delete(m.clearedFields, help.FieldLocation)
 }
 
 // SetDescription sets the "description" field.
@@ -619,18 +553,15 @@ func (m *HelpMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *HelpMutation) Fields() []string {
-	fields := make([]string, 0, 9)
+	fields := make([]string, 0, 8)
 	if m.idempotency_key != nil {
 		fields = append(fields, help.FieldIdempotencyKey)
 	}
 	if m.reporter != nil {
 		fields = append(fields, help.FieldReporter)
 	}
-	if m.latitude != nil {
-		fields = append(fields, help.FieldLatitude)
-	}
-	if m.longitude != nil {
-		fields = append(fields, help.FieldLongitude)
+	if m.location != nil {
+		fields = append(fields, help.FieldLocation)
 	}
 	if m.description != nil {
 		fields = append(fields, help.FieldDescription)
@@ -659,10 +590,8 @@ func (m *HelpMutation) Field(name string) (ent.Value, bool) {
 		return m.IdempotencyKey()
 	case help.FieldReporter:
 		return m.Reporter()
-	case help.FieldLatitude:
-		return m.Latitude()
-	case help.FieldLongitude:
-		return m.Longitude()
+	case help.FieldLocation:
+		return m.Location()
 	case help.FieldDescription:
 		return m.Description()
 	case help.FieldHeartRate:
@@ -686,10 +615,8 @@ func (m *HelpMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldIdempotencyKey(ctx)
 	case help.FieldReporter:
 		return m.OldReporter(ctx)
-	case help.FieldLatitude:
-		return m.OldLatitude(ctx)
-	case help.FieldLongitude:
-		return m.OldLongitude(ctx)
+	case help.FieldLocation:
+		return m.OldLocation(ctx)
 	case help.FieldDescription:
 		return m.OldDescription(ctx)
 	case help.FieldHeartRate:
@@ -723,19 +650,12 @@ func (m *HelpMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetReporter(v)
 		return nil
-	case help.FieldLatitude:
-		v, ok := value.(schema.Coordinate)
+	case help.FieldLocation:
+		v, ok := value.(*schema.GeoJson)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetLatitude(v)
-		return nil
-	case help.FieldLongitude:
-		v, ok := value.(schema.Coordinate)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetLongitude(v)
+		m.SetLocation(v)
 		return nil
 	case help.FieldDescription:
 		v, ok := value.(string)
@@ -780,12 +700,6 @@ func (m *HelpMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *HelpMutation) AddedFields() []string {
 	var fields []string
-	if m.addlatitude != nil {
-		fields = append(fields, help.FieldLatitude)
-	}
-	if m.addlongitude != nil {
-		fields = append(fields, help.FieldLongitude)
-	}
 	if m.addheart_rate != nil {
 		fields = append(fields, help.FieldHeartRate)
 	}
@@ -803,10 +717,6 @@ func (m *HelpMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *HelpMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case help.FieldLatitude:
-		return m.AddedLatitude()
-	case help.FieldLongitude:
-		return m.AddedLongitude()
 	case help.FieldHeartRate:
 		return m.AddedHeartRate()
 	case help.FieldBloodPressure:
@@ -822,20 +732,6 @@ func (m *HelpMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *HelpMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case help.FieldLatitude:
-		v, ok := value.(schema.Coordinate)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddLatitude(v)
-		return nil
-	case help.FieldLongitude:
-		v, ok := value.(schema.Coordinate)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddLongitude(v)
-		return nil
 	case help.FieldHeartRate:
 		v, ok := value.(int)
 		if !ok {
@@ -864,7 +760,11 @@ func (m *HelpMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *HelpMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(help.FieldLocation) {
+		fields = append(fields, help.FieldLocation)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -877,6 +777,11 @@ func (m *HelpMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *HelpMutation) ClearField(name string) error {
+	switch name {
+	case help.FieldLocation:
+		m.ClearLocation()
+		return nil
+	}
 	return fmt.Errorf("unknown Help nullable field %s", name)
 }
 
@@ -890,11 +795,8 @@ func (m *HelpMutation) ResetField(name string) error {
 	case help.FieldReporter:
 		m.ResetReporter()
 		return nil
-	case help.FieldLatitude:
-		m.ResetLatitude()
-		return nil
-	case help.FieldLongitude:
-		m.ResetLongitude()
+	case help.FieldLocation:
+		m.ResetLocation()
 		return nil
 	case help.FieldDescription:
 		m.ResetDescription()
@@ -971,10 +873,7 @@ type IncidentMutation struct {
 	id              *uuid.UUID
 	idempotency_key *string
 	reporter        *uuid.UUID
-	latitude        *schema.Coordinate
-	addlatitude     *schema.Coordinate
-	longitude       *schema.Coordinate
-	addlongitude    *schema.Coordinate
+	location        **schema.GeoJson
 	_type           *string
 	description     *string
 	image           *[]byte
@@ -1161,116 +1060,53 @@ func (m *IncidentMutation) ResetReporter() {
 	m.reporter = nil
 }
 
-// SetLatitude sets the "latitude" field.
-func (m *IncidentMutation) SetLatitude(s schema.Coordinate) {
-	m.latitude = &s
-	m.addlatitude = nil
+// SetLocation sets the "location" field.
+func (m *IncidentMutation) SetLocation(sj *schema.GeoJson) {
+	m.location = &sj
 }
 
-// Latitude returns the value of the "latitude" field in the mutation.
-func (m *IncidentMutation) Latitude() (r schema.Coordinate, exists bool) {
-	v := m.latitude
+// Location returns the value of the "location" field in the mutation.
+func (m *IncidentMutation) Location() (r *schema.GeoJson, exists bool) {
+	v := m.location
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldLatitude returns the old "latitude" field's value of the Incident entity.
+// OldLocation returns the old "location" field's value of the Incident entity.
 // If the Incident object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *IncidentMutation) OldLatitude(ctx context.Context) (v schema.Coordinate, err error) {
+func (m *IncidentMutation) OldLocation(ctx context.Context) (v *schema.GeoJson, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldLatitude is only allowed on UpdateOne operations")
+		return v, errors.New("OldLocation is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldLatitude requires an ID field in the mutation")
+		return v, errors.New("OldLocation requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldLatitude: %w", err)
+		return v, fmt.Errorf("querying old value for OldLocation: %w", err)
 	}
-	return oldValue.Latitude, nil
+	return oldValue.Location, nil
 }
 
-// AddLatitude adds s to the "latitude" field.
-func (m *IncidentMutation) AddLatitude(s schema.Coordinate) {
-	if m.addlatitude != nil {
-		*m.addlatitude += s
-	} else {
-		m.addlatitude = &s
-	}
+// ClearLocation clears the value of the "location" field.
+func (m *IncidentMutation) ClearLocation() {
+	m.location = nil
+	m.clearedFields[incident.FieldLocation] = struct{}{}
 }
 
-// AddedLatitude returns the value that was added to the "latitude" field in this mutation.
-func (m *IncidentMutation) AddedLatitude() (r schema.Coordinate, exists bool) {
-	v := m.addlatitude
-	if v == nil {
-		return
-	}
-	return *v, true
+// LocationCleared returns if the "location" field was cleared in this mutation.
+func (m *IncidentMutation) LocationCleared() bool {
+	_, ok := m.clearedFields[incident.FieldLocation]
+	return ok
 }
 
-// ResetLatitude resets all changes to the "latitude" field.
-func (m *IncidentMutation) ResetLatitude() {
-	m.latitude = nil
-	m.addlatitude = nil
-}
-
-// SetLongitude sets the "longitude" field.
-func (m *IncidentMutation) SetLongitude(s schema.Coordinate) {
-	m.longitude = &s
-	m.addlongitude = nil
-}
-
-// Longitude returns the value of the "longitude" field in the mutation.
-func (m *IncidentMutation) Longitude() (r schema.Coordinate, exists bool) {
-	v := m.longitude
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldLongitude returns the old "longitude" field's value of the Incident entity.
-// If the Incident object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *IncidentMutation) OldLongitude(ctx context.Context) (v schema.Coordinate, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldLongitude is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldLongitude requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldLongitude: %w", err)
-	}
-	return oldValue.Longitude, nil
-}
-
-// AddLongitude adds s to the "longitude" field.
-func (m *IncidentMutation) AddLongitude(s schema.Coordinate) {
-	if m.addlongitude != nil {
-		*m.addlongitude += s
-	} else {
-		m.addlongitude = &s
-	}
-}
-
-// AddedLongitude returns the value that was added to the "longitude" field in this mutation.
-func (m *IncidentMutation) AddedLongitude() (r schema.Coordinate, exists bool) {
-	v := m.addlongitude
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetLongitude resets all changes to the "longitude" field.
-func (m *IncidentMutation) ResetLongitude() {
-	m.longitude = nil
-	m.addlongitude = nil
+// ResetLocation resets all changes to the "location" field.
+func (m *IncidentMutation) ResetLocation() {
+	m.location = nil
+	delete(m.clearedFields, incident.FieldLocation)
 }
 
 // SetType sets the "type" field.
@@ -1451,18 +1287,15 @@ func (m *IncidentMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *IncidentMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 7)
 	if m.idempotency_key != nil {
 		fields = append(fields, incident.FieldIdempotencyKey)
 	}
 	if m.reporter != nil {
 		fields = append(fields, incident.FieldReporter)
 	}
-	if m.latitude != nil {
-		fields = append(fields, incident.FieldLatitude)
-	}
-	if m.longitude != nil {
-		fields = append(fields, incident.FieldLongitude)
+	if m.location != nil {
+		fields = append(fields, incident.FieldLocation)
 	}
 	if m._type != nil {
 		fields = append(fields, incident.FieldType)
@@ -1488,10 +1321,8 @@ func (m *IncidentMutation) Field(name string) (ent.Value, bool) {
 		return m.IdempotencyKey()
 	case incident.FieldReporter:
 		return m.Reporter()
-	case incident.FieldLatitude:
-		return m.Latitude()
-	case incident.FieldLongitude:
-		return m.Longitude()
+	case incident.FieldLocation:
+		return m.Location()
 	case incident.FieldType:
 		return m.GetType()
 	case incident.FieldDescription:
@@ -1513,10 +1344,8 @@ func (m *IncidentMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldIdempotencyKey(ctx)
 	case incident.FieldReporter:
 		return m.OldReporter(ctx)
-	case incident.FieldLatitude:
-		return m.OldLatitude(ctx)
-	case incident.FieldLongitude:
-		return m.OldLongitude(ctx)
+	case incident.FieldLocation:
+		return m.OldLocation(ctx)
 	case incident.FieldType:
 		return m.OldType(ctx)
 	case incident.FieldDescription:
@@ -1548,19 +1377,12 @@ func (m *IncidentMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetReporter(v)
 		return nil
-	case incident.FieldLatitude:
-		v, ok := value.(schema.Coordinate)
+	case incident.FieldLocation:
+		v, ok := value.(*schema.GeoJson)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetLatitude(v)
-		return nil
-	case incident.FieldLongitude:
-		v, ok := value.(schema.Coordinate)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetLongitude(v)
+		m.SetLocation(v)
 		return nil
 	case incident.FieldType:
 		v, ok := value.(string)
@@ -1597,26 +1419,13 @@ func (m *IncidentMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *IncidentMutation) AddedFields() []string {
-	var fields []string
-	if m.addlatitude != nil {
-		fields = append(fields, incident.FieldLatitude)
-	}
-	if m.addlongitude != nil {
-		fields = append(fields, incident.FieldLongitude)
-	}
-	return fields
+	return nil
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *IncidentMutation) AddedField(name string) (ent.Value, bool) {
-	switch name {
-	case incident.FieldLatitude:
-		return m.AddedLatitude()
-	case incident.FieldLongitude:
-		return m.AddedLongitude()
-	}
 	return nil, false
 }
 
@@ -1625,20 +1434,6 @@ func (m *IncidentMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *IncidentMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case incident.FieldLatitude:
-		v, ok := value.(schema.Coordinate)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddLatitude(v)
-		return nil
-	case incident.FieldLongitude:
-		v, ok := value.(schema.Coordinate)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddLongitude(v)
-		return nil
 	}
 	return fmt.Errorf("unknown Incident numeric field %s", name)
 }
@@ -1646,7 +1441,11 @@ func (m *IncidentMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *IncidentMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(incident.FieldLocation) {
+		fields = append(fields, incident.FieldLocation)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -1659,6 +1458,11 @@ func (m *IncidentMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *IncidentMutation) ClearField(name string) error {
+	switch name {
+	case incident.FieldLocation:
+		m.ClearLocation()
+		return nil
+	}
 	return fmt.Errorf("unknown Incident nullable field %s", name)
 }
 
@@ -1672,11 +1476,8 @@ func (m *IncidentMutation) ResetField(name string) error {
 	case incident.FieldReporter:
 		m.ResetReporter()
 		return nil
-	case incident.FieldLatitude:
-		m.ResetLatitude()
-		return nil
-	case incident.FieldLongitude:
-		m.ResetLongitude()
+	case incident.FieldLocation:
+		m.ResetLocation()
 		return nil
 	case incident.FieldType:
 		m.ResetType()

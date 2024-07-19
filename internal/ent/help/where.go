@@ -66,16 +66,9 @@ func Reporter(v uuid.UUID) predicate.Help {
 	return predicate.Help(sql.FieldEQ(FieldReporter, v))
 }
 
-// Latitude applies equality check predicate on the "latitude" field. It's identical to LatitudeEQ.
-func Latitude(v schema.Coordinate) predicate.Help {
-	vc := float64(v)
-	return predicate.Help(sql.FieldEQ(FieldLatitude, vc))
-}
-
-// Longitude applies equality check predicate on the "longitude" field. It's identical to LongitudeEQ.
-func Longitude(v schema.Coordinate) predicate.Help {
-	vc := float64(v)
-	return predicate.Help(sql.FieldEQ(FieldLongitude, vc))
+// Location applies equality check predicate on the "location" field. It's identical to LocationEQ.
+func Location(v *schema.GeoJson) predicate.Help {
+	return predicate.Help(sql.FieldEQ(FieldLocation, v))
 }
 
 // Description applies equality check predicate on the "description" field. It's identical to DescriptionEQ.
@@ -208,112 +201,54 @@ func ReporterLTE(v uuid.UUID) predicate.Help {
 	return predicate.Help(sql.FieldLTE(FieldReporter, v))
 }
 
-// LatitudeEQ applies the EQ predicate on the "latitude" field.
-func LatitudeEQ(v schema.Coordinate) predicate.Help {
-	vc := float64(v)
-	return predicate.Help(sql.FieldEQ(FieldLatitude, vc))
+// LocationEQ applies the EQ predicate on the "location" field.
+func LocationEQ(v *schema.GeoJson) predicate.Help {
+	return predicate.Help(sql.FieldEQ(FieldLocation, v))
 }
 
-// LatitudeNEQ applies the NEQ predicate on the "latitude" field.
-func LatitudeNEQ(v schema.Coordinate) predicate.Help {
-	vc := float64(v)
-	return predicate.Help(sql.FieldNEQ(FieldLatitude, vc))
+// LocationNEQ applies the NEQ predicate on the "location" field.
+func LocationNEQ(v *schema.GeoJson) predicate.Help {
+	return predicate.Help(sql.FieldNEQ(FieldLocation, v))
 }
 
-// LatitudeIn applies the In predicate on the "latitude" field.
-func LatitudeIn(vs ...schema.Coordinate) predicate.Help {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = float64(vs[i])
-	}
-	return predicate.Help(sql.FieldIn(FieldLatitude, v...))
+// LocationIn applies the In predicate on the "location" field.
+func LocationIn(vs ...*schema.GeoJson) predicate.Help {
+	return predicate.Help(sql.FieldIn(FieldLocation, vs...))
 }
 
-// LatitudeNotIn applies the NotIn predicate on the "latitude" field.
-func LatitudeNotIn(vs ...schema.Coordinate) predicate.Help {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = float64(vs[i])
-	}
-	return predicate.Help(sql.FieldNotIn(FieldLatitude, v...))
+// LocationNotIn applies the NotIn predicate on the "location" field.
+func LocationNotIn(vs ...*schema.GeoJson) predicate.Help {
+	return predicate.Help(sql.FieldNotIn(FieldLocation, vs...))
 }
 
-// LatitudeGT applies the GT predicate on the "latitude" field.
-func LatitudeGT(v schema.Coordinate) predicate.Help {
-	vc := float64(v)
-	return predicate.Help(sql.FieldGT(FieldLatitude, vc))
+// LocationGT applies the GT predicate on the "location" field.
+func LocationGT(v *schema.GeoJson) predicate.Help {
+	return predicate.Help(sql.FieldGT(FieldLocation, v))
 }
 
-// LatitudeGTE applies the GTE predicate on the "latitude" field.
-func LatitudeGTE(v schema.Coordinate) predicate.Help {
-	vc := float64(v)
-	return predicate.Help(sql.FieldGTE(FieldLatitude, vc))
+// LocationGTE applies the GTE predicate on the "location" field.
+func LocationGTE(v *schema.GeoJson) predicate.Help {
+	return predicate.Help(sql.FieldGTE(FieldLocation, v))
 }
 
-// LatitudeLT applies the LT predicate on the "latitude" field.
-func LatitudeLT(v schema.Coordinate) predicate.Help {
-	vc := float64(v)
-	return predicate.Help(sql.FieldLT(FieldLatitude, vc))
+// LocationLT applies the LT predicate on the "location" field.
+func LocationLT(v *schema.GeoJson) predicate.Help {
+	return predicate.Help(sql.FieldLT(FieldLocation, v))
 }
 
-// LatitudeLTE applies the LTE predicate on the "latitude" field.
-func LatitudeLTE(v schema.Coordinate) predicate.Help {
-	vc := float64(v)
-	return predicate.Help(sql.FieldLTE(FieldLatitude, vc))
+// LocationLTE applies the LTE predicate on the "location" field.
+func LocationLTE(v *schema.GeoJson) predicate.Help {
+	return predicate.Help(sql.FieldLTE(FieldLocation, v))
 }
 
-// LongitudeEQ applies the EQ predicate on the "longitude" field.
-func LongitudeEQ(v schema.Coordinate) predicate.Help {
-	vc := float64(v)
-	return predicate.Help(sql.FieldEQ(FieldLongitude, vc))
+// LocationIsNil applies the IsNil predicate on the "location" field.
+func LocationIsNil() predicate.Help {
+	return predicate.Help(sql.FieldIsNull(FieldLocation))
 }
 
-// LongitudeNEQ applies the NEQ predicate on the "longitude" field.
-func LongitudeNEQ(v schema.Coordinate) predicate.Help {
-	vc := float64(v)
-	return predicate.Help(sql.FieldNEQ(FieldLongitude, vc))
-}
-
-// LongitudeIn applies the In predicate on the "longitude" field.
-func LongitudeIn(vs ...schema.Coordinate) predicate.Help {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = float64(vs[i])
-	}
-	return predicate.Help(sql.FieldIn(FieldLongitude, v...))
-}
-
-// LongitudeNotIn applies the NotIn predicate on the "longitude" field.
-func LongitudeNotIn(vs ...schema.Coordinate) predicate.Help {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = float64(vs[i])
-	}
-	return predicate.Help(sql.FieldNotIn(FieldLongitude, v...))
-}
-
-// LongitudeGT applies the GT predicate on the "longitude" field.
-func LongitudeGT(v schema.Coordinate) predicate.Help {
-	vc := float64(v)
-	return predicate.Help(sql.FieldGT(FieldLongitude, vc))
-}
-
-// LongitudeGTE applies the GTE predicate on the "longitude" field.
-func LongitudeGTE(v schema.Coordinate) predicate.Help {
-	vc := float64(v)
-	return predicate.Help(sql.FieldGTE(FieldLongitude, vc))
-}
-
-// LongitudeLT applies the LT predicate on the "longitude" field.
-func LongitudeLT(v schema.Coordinate) predicate.Help {
-	vc := float64(v)
-	return predicate.Help(sql.FieldLT(FieldLongitude, vc))
-}
-
-// LongitudeLTE applies the LTE predicate on the "longitude" field.
-func LongitudeLTE(v schema.Coordinate) predicate.Help {
-	vc := float64(v)
-	return predicate.Help(sql.FieldLTE(FieldLongitude, vc))
+// LocationNotNil applies the NotNil predicate on the "location" field.
+func LocationNotNil() predicate.Help {
+	return predicate.Help(sql.FieldNotNull(FieldLocation))
 }
 
 // DescriptionEQ applies the EQ predicate on the "description" field.

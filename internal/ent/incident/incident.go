@@ -18,10 +18,8 @@ const (
 	FieldIdempotencyKey = "idempotency_key"
 	// FieldReporter holds the string denoting the reporter field in the database.
 	FieldReporter = "reporter"
-	// FieldLatitude holds the string denoting the latitude field in the database.
-	FieldLatitude = "latitude"
-	// FieldLongitude holds the string denoting the longitude field in the database.
-	FieldLongitude = "longitude"
+	// FieldLocation holds the string denoting the location field in the database.
+	FieldLocation = "location"
 	// FieldType holds the string denoting the type field in the database.
 	FieldType = "type"
 	// FieldDescription holds the string denoting the description field in the database.
@@ -39,8 +37,7 @@ var Columns = []string{
 	FieldID,
 	FieldIdempotencyKey,
 	FieldReporter,
-	FieldLatitude,
-	FieldLongitude,
+	FieldLocation,
 	FieldType,
 	FieldDescription,
 	FieldImage,
@@ -82,14 +79,9 @@ func ByReporter(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldReporter, opts...).ToFunc()
 }
 
-// ByLatitude orders the results by the latitude field.
-func ByLatitude(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldLatitude, opts...).ToFunc()
-}
-
-// ByLongitude orders the results by the longitude field.
-func ByLongitude(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldLongitude, opts...).ToFunc()
+// ByLocation orders the results by the location field.
+func ByLocation(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLocation, opts...).ToFunc()
 }
 
 // ByType orders the results by the type field.

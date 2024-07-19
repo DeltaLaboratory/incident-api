@@ -34,15 +34,9 @@ func (ic *IncidentCreate) SetReporter(u uuid.UUID) *IncidentCreate {
 	return ic
 }
 
-// SetLatitude sets the "latitude" field.
-func (ic *IncidentCreate) SetLatitude(s schema.Coordinate) *IncidentCreate {
-	ic.mutation.SetLatitude(s)
-	return ic
-}
-
-// SetLongitude sets the "longitude" field.
-func (ic *IncidentCreate) SetLongitude(s schema.Coordinate) *IncidentCreate {
-	ic.mutation.SetLongitude(s)
+// SetLocation sets the "location" field.
+func (ic *IncidentCreate) SetLocation(sj *schema.GeoJson) *IncidentCreate {
+	ic.mutation.SetLocation(sj)
 	return ic
 }
 
@@ -145,12 +139,6 @@ func (ic *IncidentCreate) check() error {
 	if _, ok := ic.mutation.Reporter(); !ok {
 		return &ValidationError{Name: "reporter", err: errors.New(`ent: missing required field "Incident.reporter"`)}
 	}
-	if _, ok := ic.mutation.Latitude(); !ok {
-		return &ValidationError{Name: "latitude", err: errors.New(`ent: missing required field "Incident.latitude"`)}
-	}
-	if _, ok := ic.mutation.Longitude(); !ok {
-		return &ValidationError{Name: "longitude", err: errors.New(`ent: missing required field "Incident.longitude"`)}
-	}
 	if _, ok := ic.mutation.GetType(); !ok {
 		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "Incident.type"`)}
 	}
@@ -206,13 +194,9 @@ func (ic *IncidentCreate) createSpec() (*Incident, *sqlgraph.CreateSpec) {
 		_spec.SetField(incident.FieldReporter, field.TypeUUID, value)
 		_node.Reporter = value
 	}
-	if value, ok := ic.mutation.Latitude(); ok {
-		_spec.SetField(incident.FieldLatitude, field.TypeFloat64, value)
-		_node.Latitude = value
-	}
-	if value, ok := ic.mutation.Longitude(); ok {
-		_spec.SetField(incident.FieldLongitude, field.TypeFloat64, value)
-		_node.Longitude = value
+	if value, ok := ic.mutation.Location(); ok {
+		_spec.SetField(incident.FieldLocation, field.TypeOther, value)
+		_node.Location = value
 	}
 	if value, ok := ic.mutation.GetType(); ok {
 		_spec.SetField(incident.FieldType, field.TypeString, value)

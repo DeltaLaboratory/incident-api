@@ -18,7 +18,7 @@ func init() {
 	helpFields := schema.Help{}.Fields()
 	_ = helpFields
 	// helpDescCreatedAt is the schema descriptor for created_at field.
-	helpDescCreatedAt := helpFields[9].Descriptor()
+	helpDescCreatedAt := helpFields[8].Descriptor()
 	// help.DefaultCreatedAt holds the default value on creation for the created_at field.
 	help.DefaultCreatedAt = helpDescCreatedAt.Default.(func() time.Time)
 	// helpDescID is the schema descriptor for id field.
@@ -28,7 +28,7 @@ func init() {
 	incidentFields := schema.Incident{}.Fields()
 	_ = incidentFields
 	// incidentDescCreatedAt is the schema descriptor for created_at field.
-	incidentDescCreatedAt := incidentFields[8].Descriptor()
+	incidentDescCreatedAt := incidentFields[7].Descriptor()
 	// incident.DefaultCreatedAt holds the default value on creation for the created_at field.
 	incident.DefaultCreatedAt = incidentDescCreatedAt.Default.(func() time.Time)
 	// incidentDescID is the schema descriptor for id field.

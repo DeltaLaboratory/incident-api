@@ -34,15 +34,9 @@ func (hc *HelpCreate) SetReporter(u uuid.UUID) *HelpCreate {
 	return hc
 }
 
-// SetLatitude sets the "latitude" field.
-func (hc *HelpCreate) SetLatitude(s schema.Coordinate) *HelpCreate {
-	hc.mutation.SetLatitude(s)
-	return hc
-}
-
-// SetLongitude sets the "longitude" field.
-func (hc *HelpCreate) SetLongitude(s schema.Coordinate) *HelpCreate {
-	hc.mutation.SetLongitude(s)
+// SetLocation sets the "location" field.
+func (hc *HelpCreate) SetLocation(sj *schema.GeoJson) *HelpCreate {
+	hc.mutation.SetLocation(sj)
 	return hc
 }
 
@@ -151,12 +145,6 @@ func (hc *HelpCreate) check() error {
 	if _, ok := hc.mutation.Reporter(); !ok {
 		return &ValidationError{Name: "reporter", err: errors.New(`ent: missing required field "Help.reporter"`)}
 	}
-	if _, ok := hc.mutation.Latitude(); !ok {
-		return &ValidationError{Name: "latitude", err: errors.New(`ent: missing required field "Help.latitude"`)}
-	}
-	if _, ok := hc.mutation.Longitude(); !ok {
-		return &ValidationError{Name: "longitude", err: errors.New(`ent: missing required field "Help.longitude"`)}
-	}
 	if _, ok := hc.mutation.Description(); !ok {
 		return &ValidationError{Name: "description", err: errors.New(`ent: missing required field "Help.description"`)}
 	}
@@ -215,13 +203,9 @@ func (hc *HelpCreate) createSpec() (*Help, *sqlgraph.CreateSpec) {
 		_spec.SetField(help.FieldReporter, field.TypeUUID, value)
 		_node.Reporter = value
 	}
-	if value, ok := hc.mutation.Latitude(); ok {
-		_spec.SetField(help.FieldLatitude, field.TypeFloat64, value)
-		_node.Latitude = value
-	}
-	if value, ok := hc.mutation.Longitude(); ok {
-		_spec.SetField(help.FieldLongitude, field.TypeFloat64, value)
-		_node.Longitude = value
+	if value, ok := hc.mutation.Location(); ok {
+		_spec.SetField(help.FieldLocation, field.TypeOther, value)
+		_node.Location = value
 	}
 	if value, ok := hc.mutation.Description(); ok {
 		_spec.SetField(help.FieldDescription, field.TypeString, value)

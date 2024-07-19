@@ -9,6 +9,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"github.com/twpayne/go-geom"
+	"github.com/twpayne/go-geom/encoding/geojson"
 
 	"github.com/DeltaLaboratory/incident-api/internal/ent"
 	"github.com/DeltaLaboratory/incident-api/internal/ent/incident"
@@ -38,12 +40,19 @@ func (i *Incident) Report(ctx *fiber.Ctx) error {
 		})
 	}
 
+	encodedGeo, err := geojson.Encode(geom.NewPoint(geom.XY).MustSetCoords([]float64{float64(req.Latitude), float64(req.Longitude)}))
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{
+			Code:    common.GeneralInternalError,
+			Message: fmt.Errorf("failed to encode location: %w", err).Error(),
+		})
+	}
+
 	qb := i.DB.Incident.Create()
 	qb.SetIdempotencyKey(req.UserKey)
 	qb.SetReporter(req.UserID)
-	qb.SetLatitude(req.Latitude)
-	qb.SetLongitude(req.Longitude)
 	qb.SetType(req.Type)
+	qb.SetLocation(&schema.GeoJson{Geometry: encodedGeo})
 	qb.SetDescription(req.Description)
 
 	if req.Image != nil {
@@ -157,24 +166,17 @@ func (i *Incident) Query(ctx *fiber.Ctx) error {
 		})
 	}
 
-	query := i.DB.Incident.Query()
+	qb := i.DB.Incident.Query()
 
 	if req.IncidentID != nil {
-		query = query.Where(incident.ID(*req.IncidentID))
+		qb = qb.Where(incident.ID(*req.IncidentID))
 	} else {
-		// Convert LatLong to radians
-		lat1 := req.Latitude.Radians()
-		lon1 := req.Longitude.Radians()
-
-		query = query.Where(func(s *sql.Selector) {
-			s.Where(sql.ExprP(fmt.Sprintf(
-				"6371000 * 2 * ASIN(SQRT(POWER(SIN((%f - RADIANS(latitude)) / 2), 2) + COS(%f) * COS(RADIANS(latitude)) * POWER(SIN((%f - RADIANS(longitude)) / 2), 2))) <= ?;",
-				lat1, lat1, lon1,
-			), req.Radius))
+		qb = qb.Where(func(selector *sql.Selector) {
+			selector.Where(sql.ExprP("ST_DWithin(location, ST_MakePoint(?, ?)::geography, ?)", req.Longitude, req.Latitude, req.Radius))
 		})
 	}
 
-	incidents, err := query.Select(incident.FieldID, incident.FieldType, incident.FieldReporter, incident.FieldLatitude, incident.FieldLongitude, incident.FieldDescription, incident.FieldCreatedAt).All(ctx.Context())
+	incidents, err := qb.Select(incident.FieldID, incident.FieldType, incident.FieldReporter, incident.FieldLocation, incident.FieldDescription, incident.FieldCreatedAt).All(ctx.Context())
 	if err != nil {
 		i.Logger.Error().Err(err).Msg("failed to query incidents")
 		return ctx.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{
@@ -185,11 +187,20 @@ func (i *Incident) Query(ctx *fiber.Ctx) error {
 
 	response := make([]QueryResponse, len(incidents))
 	for idx, inc := range incidents {
+		decodedGeo, err := inc.Location.Decode()
+		if err != nil {
+			i.Logger.Error().Err(err).Msg("failed to decode location")
+			return ctx.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{
+				Code:    common.GeneralInternalError,
+				Message: "failed to decode location",
+			})
+		}
+
 		response[idx] = QueryResponse{
 			IncidentID:  inc.ID,
 			Reporter:    inc.Reporter,
-			Latitude:    inc.Latitude,
-			Longitude:   inc.Longitude,
+			Latitude:    schema.Coordinate(decodedGeo.FlatCoords()[0]),
+			Longitude:   schema.Coordinate(decodedGeo.FlatCoords()[1]),
 			Type:        inc.Type,
 			Description: inc.Description,
 			CreatedAt:   inc.CreatedAt,

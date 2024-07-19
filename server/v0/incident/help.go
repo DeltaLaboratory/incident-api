@@ -1,12 +1,13 @@
 package incident
 
 import (
-	"fmt"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"github.com/twpayne/go-geom"
+	"github.com/twpayne/go-geom/encoding/geojson"
 
 	"github.com/DeltaLaboratory/incident-api/internal/ent/help"
 	"github.com/DeltaLaboratory/incident-api/internal/ent/schema"
@@ -33,11 +34,20 @@ func (i *Incident) Help(ctx *fiber.Ctx) error {
 		})
 	}
 
+	encodedGeo, err := geojson.Encode(geom.NewPoint(geom.XY).MustSetCoords([]float64{float64(req.Longitude), float64(req.Latitude)}))
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{
+			Code:    common.GeneralInternalError,
+			Message: err.Error(),
+		})
+	}
+
 	qb := i.DB.Help.Create()
 	qb.SetReporter(req.UserID)
 	qb.SetIdempotencyKey(req.IdempotencyKey)
-	qb.SetLatitude(req.Latitude)
-	qb.SetLongitude(req.Longitude)
+	qb.SetLocation(&schema.GeoJson{
+		Geometry: encodedGeo,
+	})
 	qb.SetDescription(req.Description)
 
 	if req.HeartRate != nil {
@@ -88,15 +98,9 @@ func (i *Incident) QueryHelp(ctx *fiber.Ctx) error {
 	if req.HelpID != nil {
 		qb = qb.Where(help.ID(*req.HelpID))
 	} else {
-		// Convert LatLong to radians
-		lat1 := req.Latitude.Radians()
-		lon1 := req.Longitude.Radians()
-
-		qb = qb.Where(func(s *sql.Selector) {
-			s.Where(sql.ExprP(fmt.Sprintf(
-				"6371000 * 2 * ASIN(SQRT(POWER(SIN((%f - RADIANS(latitude)) / 2), 2) + COS(%f) * COS(RADIANS(latitude)) * POWER(SIN((%f - RADIANS(longitude)) / 2), 2))) <= ?",
-				lat1, lat1, lon1,
-			), req.Radius))
+		// use postgis function to calculate distance
+		qb = qb.Where(func(selector *sql.Selector) {
+			selector.Where(sql.ExprP("ST_DWithin(location, ST_MakePoint(?, ?)::geography, ?)", req.Longitude, req.Latitude, req.Radius))
 		})
 	}
 
@@ -110,9 +114,17 @@ func (i *Incident) QueryHelp(ctx *fiber.Ctx) error {
 
 	response := make([]QueryHelpResponse, len(helps))
 	for i, h := range helps {
+		decodedGeo, err := h.Location.Decode()
+		if err != nil {
+			return ctx.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{
+				Code:    common.GeneralInternalError,
+				Message: err.Error(),
+			})
+		}
+
 		response[i] = QueryHelpResponse{
-			Latitude:        h.Latitude,
-			Longitude:       h.Longitude,
+			Latitude:        schema.Coordinate(decodedGeo.FlatCoords()[0]),
+			Longitude:       schema.Coordinate(decodedGeo.FlatCoords()[1]),
 			Description:     h.Description,
 			HeartRate:       h.HeartRate,
 			BloodPressure:   h.BloodPressure,
