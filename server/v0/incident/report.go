@@ -51,6 +51,8 @@ func (i *Incident) Report(ctx *fiber.Ctx) error {
 		})
 	}
 
+	req.UserKey = uuid.New().String()
+
 	qb := i.DB.Incident.Create()
 	qb.SetIdempotencyKey(req.UserKey)
 	qb.SetReporter(req.UserID)
