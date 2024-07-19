@@ -29,6 +29,7 @@ import com.squareup.moshi.JsonClass
  * @param longitude 
  * @param reporter 
  * @param type 
+ * @param vote 
  */
 
 
@@ -53,7 +54,10 @@ data class IncidentQueryResponse (
     val reporter: kotlin.String? = null,
 
     @Json(name = "type")
-    val type: kotlin.String? = null
+    val type: kotlin.String? = null,
+
+    @Json(name = "vote")
+    val vote: kotlin.Int? = null
 
 ) {
 

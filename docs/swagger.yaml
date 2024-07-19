@@ -243,7 +243,9 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/incident.QueryResponse'
+            items:
+              $ref: '#/definitions/incident.QueryResponse'
+            type: array
         "400":
           description: Bad Request
           schema:

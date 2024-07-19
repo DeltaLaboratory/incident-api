@@ -51,6 +51,7 @@ All URIs are relative to *https://incident.deltalab.dev/v0*
 | *IncidentApi* | [**incidentQueryPost**](docs/IncidentApi.md#incidentquerypost) | **POST** incident/query | Query incidents |
 | *IncidentApi* | [**incidentReportDelete**](docs/IncidentApi.md#incidentreportdelete) | **DELETE** incident/report | Delete an incident report |
 | *IncidentApi* | [**incidentReportPost**](docs/IncidentApi.md#incidentreportpost) | **POST** incident/report | Report an incident |
+| *IncidentApi* | [**incidentVotePost**](docs/IncidentApi.md#incidentvotepost) | **POST** incident/vote | Vote an incident |
 
 
 <a id="documentation-for-models"></a>
@@ -65,6 +66,7 @@ All URIs are relative to *https://incident.deltalab.dev/v0*
  - [org.openapitools.client.models.IncidentQueryResponse](docs/IncidentQueryResponse.md)
  - [org.openapitools.client.models.IncidentReportRequest](docs/IncidentReportRequest.md)
  - [org.openapitools.client.models.IncidentReportResponse](docs/IncidentReportResponse.md)
+ - [org.openapitools.client.models.IncidentVoteRequest](docs/IncidentVoteRequest.md)
 
 
 <a id="documentation-for-authorization"></a>

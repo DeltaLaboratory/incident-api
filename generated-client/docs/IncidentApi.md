@@ -10,6 +10,7 @@ All URIs are relative to *https://incident.deltalab.dev/v0*
 | [**incidentQueryPost**](IncidentApi.md#incidentQueryPost) | **POST** incident/query | Query incidents |
 | [**incidentReportDelete**](IncidentApi.md#incidentReportDelete) | **DELETE** incident/report | Delete an incident report |
 | [**incidentReportPost**](IncidentApi.md#incidentReportPost) | **POST** incident/report | Report an incident |
+| [**incidentVotePost**](IncidentApi.md#incidentVotePost) | **POST** incident/vote | Vote an incident |
 
 
 
@@ -139,7 +140,7 @@ val apiClient = ApiClient()
 val webService = apiClient.createWebservice(IncidentApi::class.java)
 val request : IncidentQueryRequest =  // IncidentQueryRequest | Query request
 
-val result : IncidentQueryResponse = webService.incidentQueryPost(request)
+val result : kotlin.collections.List<IncidentQueryResponse> = webService.incidentQueryPost(request)
 ```
 
 ### Parameters
@@ -149,7 +150,7 @@ val result : IncidentQueryResponse = webService.incidentQueryPost(request)
 
 ### Return type
 
-[**IncidentQueryResponse**](IncidentQueryResponse.md)
+[**kotlin.collections.List&lt;IncidentQueryResponse&gt;**](IncidentQueryResponse.md)
 
 ### Authorization
 
@@ -233,4 +234,41 @@ No authorization required
 
  - **Content-Type**: application/json
  - **Accept**: application/json
+
+
+Vote an incident
+
+Vote an incident
+
+### Example
+```kotlin
+// Import classes:
+//import org.openapitools.client.*
+//import org.openapitools.client.infrastructure.*
+//import org.openapitools.client.models.*
+
+val apiClient = ApiClient()
+val webService = apiClient.createWebservice(IncidentApi::class.java)
+val request : IncidentVoteRequest =  // IncidentVoteRequest | Vote request
+
+webService.incidentVotePost(request)
+```
+
+### Parameters
+| Name | Type | Description  | Notes |
+| ------------- | ------------- | ------------- | ------------- |
+| **request** | [**IncidentVoteRequest**](IncidentVoteRequest.md)| Vote request | |
+
+### Return type
+
+null (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: */*
 

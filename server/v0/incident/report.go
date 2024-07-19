@@ -75,6 +75,8 @@ func (i *Incident) Report(ctx *fiber.Ctx) error {
 		}
 
 		qb.SetImage(decoded)
+	} else {
+		qb.SetImage(nil)
 	}
 
 	inci, err := qb.Save(ctx.Context())
@@ -154,7 +156,6 @@ func (i *Incident) DeleteReport(ctx *fiber.Ctx) error {
 //	@Produce		json
 //	@Param			request	body		QueryRequest	true	"Query request"
 //	@Success		200		{object}	[]QueryResponse
-//	@Success		200		{object}	QueryResponse
 //	@Failure		400		{object}	common.ErrorResponse
 //	@Failure		500		{object}	common.ErrorResponse
 //

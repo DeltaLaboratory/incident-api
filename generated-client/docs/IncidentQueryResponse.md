@@ -11,6 +11,7 @@
 | **longitude** | [**java.math.BigDecimal**](java.math.BigDecimal.md) |  |  [optional] |
 | **reporter** | **kotlin.String** |  |  [optional] |
 | **type** | **kotlin.String** |  |  [optional] |
+| **vote** | **kotlin.Int** |  |  [optional] |
 
 
 

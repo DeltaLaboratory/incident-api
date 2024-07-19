@@ -176,7 +176,10 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/incident.QueryResponse"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/incident.QueryResponse"
+                            }
                         }
                     },
                     "400": {

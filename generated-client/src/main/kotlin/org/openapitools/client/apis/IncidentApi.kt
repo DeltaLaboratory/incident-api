@@ -15,6 +15,7 @@ import org.openapitools.client.models.IncidentQueryRequest
 import org.openapitools.client.models.IncidentQueryResponse
 import org.openapitools.client.models.IncidentReportRequest
 import org.openapitools.client.models.IncidentReportResponse
+import org.openapitools.client.models.IncidentVoteRequest
 
 interface IncidentApi {
     /**
@@ -69,10 +70,10 @@ interface IncidentApi {
      *  - 500: Internal Server Error
      *
      * @param request Query request
-     * @return [Call]<[IncidentQueryResponse]>
+     * @return [Call]<[kotlin.collections.List<IncidentQueryResponse>]>
      */
     @POST("incident/query")
-    fun incidentQueryPost(@Body request: IncidentQueryRequest): Call<IncidentQueryResponse>
+    fun incidentQueryPost(@Body request: IncidentQueryRequest): Call<kotlin.collections.List<IncidentQueryResponse>>
 
     /**
      * Delete an incident report
@@ -102,5 +103,21 @@ interface IncidentApi {
      */
     @POST("incident/report")
     fun incidentReportPost(@Body request: IncidentReportRequest): Call<IncidentReportResponse>
+
+    /**
+     * Vote an incident
+     * Vote an incident
+     * Responses:
+     *  - 204: No Content
+     *  - 400: Bad Request
+     *  - 404: Not Found
+     *  - 409: Conflict
+     *  - 500: Internal Server Error
+     *
+     * @param request Vote request
+     * @return [Call]<[Unit]>
+     */
+    @POST("incident/vote")
+    fun incidentVotePost(@Body request: IncidentVoteRequest): Call<Unit>
 
 }

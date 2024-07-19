@@ -10,6 +10,7 @@ docs/IncidentQueryRequest.md
 docs/IncidentQueryResponse.md
 docs/IncidentReportRequest.md
 docs/IncidentReportResponse.md
+docs/IncidentVoteRequest.md
 gradle/wrapper/gradle-wrapper.jar
 gradle/wrapper/gradle-wrapper.properties
 gradlew
@@ -37,3 +38,4 @@ src/main/kotlin/org/openapitools/client/models/IncidentQueryRequest.kt
 src/main/kotlin/org/openapitools/client/models/IncidentQueryResponse.kt
 src/main/kotlin/org/openapitools/client/models/IncidentReportRequest.kt
 src/main/kotlin/org/openapitools/client/models/IncidentReportResponse.kt
+src/main/kotlin/org/openapitools/client/models/IncidentVoteRequest.kt
