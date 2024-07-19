@@ -20,7 +20,7 @@ func (i *Incident) Route(route *fiber.App, prefix ...string) {
 	r.Post("/report", i.Report)
 	r.Delete("/report", i.DeleteReport)
 	r.Post("/query", i.Query)
-	r.Get("/image/:incident_id", i.Query)
+	r.Get("/image/:incident_id", i.QueryImage)
 	r.Post("/help", i.Help)
 	r.Post("/help/query", i.QueryHelp)
 	r.Post("/incident/vote", i.Vote)
