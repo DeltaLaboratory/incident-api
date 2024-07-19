@@ -35,6 +35,8 @@ var (
 		{Name: "type", Type: field.TypeString},
 		{Name: "description", Type: field.TypeString},
 		{Name: "image", Type: field.TypeBytes},
+		{Name: "vote", Type: field.TypeInt, Default: 0},
+		{Name: "vote_filter", Type: field.TypeBytes},
 		{Name: "created_at", Type: field.TypeTime},
 	}
 	// IncidentsTable holds the schema information for the "incidents" table.

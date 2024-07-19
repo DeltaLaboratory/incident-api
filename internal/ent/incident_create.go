@@ -58,6 +58,26 @@ func (ic *IncidentCreate) SetImage(b []byte) *IncidentCreate {
 	return ic
 }
 
+// SetVote sets the "vote" field.
+func (ic *IncidentCreate) SetVote(i int) *IncidentCreate {
+	ic.mutation.SetVote(i)
+	return ic
+}
+
+// SetNillableVote sets the "vote" field if the given value is not nil.
+func (ic *IncidentCreate) SetNillableVote(i *int) *IncidentCreate {
+	if i != nil {
+		ic.SetVote(*i)
+	}
+	return ic
+}
+
+// SetVoteFilter sets the "vote_filter" field.
+func (ic *IncidentCreate) SetVoteFilter(b []byte) *IncidentCreate {
+	ic.mutation.SetVoteFilter(b)
+	return ic
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (ic *IncidentCreate) SetCreatedAt(t time.Time) *IncidentCreate {
 	ic.mutation.SetCreatedAt(t)
@@ -121,6 +141,10 @@ func (ic *IncidentCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (ic *IncidentCreate) defaults() {
+	if _, ok := ic.mutation.Vote(); !ok {
+		v := incident.DefaultVote
+		ic.mutation.SetVote(v)
+	}
 	if _, ok := ic.mutation.CreatedAt(); !ok {
 		v := incident.DefaultCreatedAt()
 		ic.mutation.SetCreatedAt(v)
@@ -147,6 +171,12 @@ func (ic *IncidentCreate) check() error {
 	}
 	if _, ok := ic.mutation.Image(); !ok {
 		return &ValidationError{Name: "image", err: errors.New(`ent: missing required field "Incident.image"`)}
+	}
+	if _, ok := ic.mutation.Vote(); !ok {
+		return &ValidationError{Name: "vote", err: errors.New(`ent: missing required field "Incident.vote"`)}
+	}
+	if _, ok := ic.mutation.VoteFilter(); !ok {
+		return &ValidationError{Name: "vote_filter", err: errors.New(`ent: missing required field "Incident.vote_filter"`)}
 	}
 	if _, ok := ic.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Incident.created_at"`)}
@@ -209,6 +239,14 @@ func (ic *IncidentCreate) createSpec() (*Incident, *sqlgraph.CreateSpec) {
 	if value, ok := ic.mutation.Image(); ok {
 		_spec.SetField(incident.FieldImage, field.TypeBytes, value)
 		_node.Image = &value
+	}
+	if value, ok := ic.mutation.Vote(); ok {
+		_spec.SetField(incident.FieldVote, field.TypeInt, value)
+		_node.Vote = value
+	}
+	if value, ok := ic.mutation.VoteFilter(); ok {
+		_spec.SetField(incident.FieldVoteFilter, field.TypeBytes, value)
+		_node.VoteFilter = &value
 	}
 	if value, ok := ic.mutation.CreatedAt(); ok {
 		_spec.SetField(incident.FieldCreatedAt, field.TypeTime, value)

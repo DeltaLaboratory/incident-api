@@ -283,6 +283,58 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/incident/vote": {
+            "post": {
+                "description": "Vote an incident",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Incident"
+                ],
+                "summary": "Vote an incident",
+                "parameters": [
+                    {
+                        "description": "Vote request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/incident.VoteRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/common.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/common.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/common.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/common.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -428,6 +480,9 @@ const docTemplate = `{
                 },
                 "type": {
                     "type": "string"
+                },
+                "vote": {
+                    "type": "integer"
                 }
             }
         },
@@ -465,6 +520,20 @@ const docTemplate = `{
             "properties": {
                 "incident_id": {
                     "type": "string"
+                }
+            }
+        },
+        "incident.VoteRequest": {
+            "type": "object",
+            "properties": {
+                "incident_id": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "vote_positive": {
+                    "type": "boolean"
                 }
             }
         }

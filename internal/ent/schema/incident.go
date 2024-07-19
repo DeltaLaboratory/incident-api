@@ -38,6 +38,9 @@ func (Incident) Fields() []ent.Field {
 		field.String("description"),
 		field.Bytes("image").Nillable(),
 
+		field.Int("vote").Default(0),
+		field.Bytes("vote_filter").Nillable(),
+
 		field.Time("created_at").Default(time.Now),
 	}
 }

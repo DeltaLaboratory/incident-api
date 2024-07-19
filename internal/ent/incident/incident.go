@@ -26,6 +26,10 @@ const (
 	FieldDescription = "description"
 	// FieldImage holds the string denoting the image field in the database.
 	FieldImage = "image"
+	// FieldVote holds the string denoting the vote field in the database.
+	FieldVote = "vote"
+	// FieldVoteFilter holds the string denoting the vote_filter field in the database.
+	FieldVoteFilter = "vote_filter"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// Table holds the table name of the incident in the database.
@@ -41,6 +45,8 @@ var Columns = []string{
 	FieldType,
 	FieldDescription,
 	FieldImage,
+	FieldVote,
+	FieldVoteFilter,
 	FieldCreatedAt,
 }
 
@@ -55,6 +61,8 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// DefaultVote holds the default value on creation for the "vote" field.
+	DefaultVote int
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultID holds the default value on creation for the "id" field.
@@ -92,6 +100,11 @@ func ByType(opts ...sql.OrderTermOption) OrderOption {
 // ByDescription orders the results by the description field.
 func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDescription, opts...).ToFunc()
+}
+
+// ByVote orders the results by the vote field.
+func ByVote(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldVote, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.

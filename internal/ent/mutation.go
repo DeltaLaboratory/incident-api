@@ -877,6 +877,9 @@ type IncidentMutation struct {
 	_type           *string
 	description     *string
 	image           *[]byte
+	vote            *int
+	addvote         *int
+	vote_filter     *[]byte
 	created_at      *time.Time
 	clearedFields   map[string]struct{}
 	done            bool
@@ -1217,6 +1220,98 @@ func (m *IncidentMutation) ResetImage() {
 	m.image = nil
 }
 
+// SetVote sets the "vote" field.
+func (m *IncidentMutation) SetVote(i int) {
+	m.vote = &i
+	m.addvote = nil
+}
+
+// Vote returns the value of the "vote" field in the mutation.
+func (m *IncidentMutation) Vote() (r int, exists bool) {
+	v := m.vote
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldVote returns the old "vote" field's value of the Incident entity.
+// If the Incident object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IncidentMutation) OldVote(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldVote is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldVote requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldVote: %w", err)
+	}
+	return oldValue.Vote, nil
+}
+
+// AddVote adds i to the "vote" field.
+func (m *IncidentMutation) AddVote(i int) {
+	if m.addvote != nil {
+		*m.addvote += i
+	} else {
+		m.addvote = &i
+	}
+}
+
+// AddedVote returns the value that was added to the "vote" field in this mutation.
+func (m *IncidentMutation) AddedVote() (r int, exists bool) {
+	v := m.addvote
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetVote resets all changes to the "vote" field.
+func (m *IncidentMutation) ResetVote() {
+	m.vote = nil
+	m.addvote = nil
+}
+
+// SetVoteFilter sets the "vote_filter" field.
+func (m *IncidentMutation) SetVoteFilter(b []byte) {
+	m.vote_filter = &b
+}
+
+// VoteFilter returns the value of the "vote_filter" field in the mutation.
+func (m *IncidentMutation) VoteFilter() (r []byte, exists bool) {
+	v := m.vote_filter
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldVoteFilter returns the old "vote_filter" field's value of the Incident entity.
+// If the Incident object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IncidentMutation) OldVoteFilter(ctx context.Context) (v *[]byte, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldVoteFilter is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldVoteFilter requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldVoteFilter: %w", err)
+	}
+	return oldValue.VoteFilter, nil
+}
+
+// ResetVoteFilter resets all changes to the "vote_filter" field.
+func (m *IncidentMutation) ResetVoteFilter() {
+	m.vote_filter = nil
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (m *IncidentMutation) SetCreatedAt(t time.Time) {
 	m.created_at = &t
@@ -1287,7 +1382,7 @@ func (m *IncidentMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *IncidentMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 9)
 	if m.idempotency_key != nil {
 		fields = append(fields, incident.FieldIdempotencyKey)
 	}
@@ -1305,6 +1400,12 @@ func (m *IncidentMutation) Fields() []string {
 	}
 	if m.image != nil {
 		fields = append(fields, incident.FieldImage)
+	}
+	if m.vote != nil {
+		fields = append(fields, incident.FieldVote)
+	}
+	if m.vote_filter != nil {
+		fields = append(fields, incident.FieldVoteFilter)
 	}
 	if m.created_at != nil {
 		fields = append(fields, incident.FieldCreatedAt)
@@ -1329,6 +1430,10 @@ func (m *IncidentMutation) Field(name string) (ent.Value, bool) {
 		return m.Description()
 	case incident.FieldImage:
 		return m.Image()
+	case incident.FieldVote:
+		return m.Vote()
+	case incident.FieldVoteFilter:
+		return m.VoteFilter()
 	case incident.FieldCreatedAt:
 		return m.CreatedAt()
 	}
@@ -1352,6 +1457,10 @@ func (m *IncidentMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldDescription(ctx)
 	case incident.FieldImage:
 		return m.OldImage(ctx)
+	case incident.FieldVote:
+		return m.OldVote(ctx)
+	case incident.FieldVoteFilter:
+		return m.OldVoteFilter(ctx)
 	case incident.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	}
@@ -1405,6 +1514,20 @@ func (m *IncidentMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetImage(v)
 		return nil
+	case incident.FieldVote:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetVote(v)
+		return nil
+	case incident.FieldVoteFilter:
+		v, ok := value.([]byte)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetVoteFilter(v)
+		return nil
 	case incident.FieldCreatedAt:
 		v, ok := value.(time.Time)
 		if !ok {
@@ -1419,13 +1542,21 @@ func (m *IncidentMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *IncidentMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addvote != nil {
+		fields = append(fields, incident.FieldVote)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *IncidentMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case incident.FieldVote:
+		return m.AddedVote()
+	}
 	return nil, false
 }
 
@@ -1434,6 +1565,13 @@ func (m *IncidentMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *IncidentMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case incident.FieldVote:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddVote(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Incident numeric field %s", name)
 }
@@ -1487,6 +1625,12 @@ func (m *IncidentMutation) ResetField(name string) error {
 		return nil
 	case incident.FieldImage:
 		m.ResetImage()
+		return nil
+	case incident.FieldVote:
+		m.ResetVote()
+		return nil
+	case incident.FieldVoteFilter:
+		m.ResetVoteFilter()
 		return nil
 	case incident.FieldCreatedAt:
 		m.ResetCreatedAt()

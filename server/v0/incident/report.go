@@ -1,12 +1,14 @@
 package incident
 
 import (
+	"bytes"
 	"encoding/base64"
 	"fmt"
 	"net/http"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/bits-and-blooms/bloom/v3"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/twpayne/go-geom"
@@ -176,7 +178,7 @@ func (i *Incident) Query(ctx *fiber.Ctx) error {
 		})
 	}
 
-	incidents, err := qb.Select(incident.FieldID, incident.FieldType, incident.FieldReporter, incident.FieldLocation, incident.FieldDescription, incident.FieldCreatedAt).All(ctx.Context())
+	incidents, err := qb.Select(incident.FieldID, incident.FieldType, incident.FieldReporter, incident.FieldLocation, incident.FieldDescription, incident.FieldVote, incident.FieldCreatedAt).All(ctx.Context())
 	if err != nil {
 		i.Logger.Error().Err(err).Msg("failed to query incidents")
 		return ctx.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{
@@ -203,6 +205,7 @@ func (i *Incident) Query(ctx *fiber.Ctx) error {
 			Longitude:   schema.Coordinate(decodedGeo.FlatCoords()[1]),
 			Type:        inc.Type,
 			Description: inc.Description,
+			Vote:        inc.Vote,
 			CreatedAt:   inc.CreatedAt,
 		}
 	}
@@ -253,6 +256,133 @@ func (i *Incident) QueryImage(ctx *fiber.Ctx) error {
 	}
 
 	return ctx.Send(*inc.Image)
+}
+
+// Vote godoc
+//
+//	@Summary		Vote an incident
+//	@Description	Vote an incident
+//	@Tags			Incident
+//	@Accept			json
+//	@Param			request	body		VoteRequest	true	"Vote request"
+//	@Success		204
+//	@Failure		400	{object}	common.ErrorResponse
+//	@Failure		404	{object}	common.ErrorResponse
+//	@Failure		409	{object}	common.ErrorResponse
+//	@Failure		500	{object}	common.ErrorResponse
+//
+//	@Router			/incident/vote [post]
+func (i *Incident) Vote(ctx *fiber.Ctx) error {
+	req := new(VoteRequest)
+	if err := common.ParseBody(ctx, req); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{
+			Code:    common.GeneralBadRequest,
+			Message: fmt.Errorf("failed to parse request: %w", err).Error(),
+		})
+	}
+
+	tx, err := i.DB.Tx(ctx.Context())
+	if err != nil {
+		i.Logger.Error().Err(err).Msg("failed to start transaction")
+		return ctx.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{
+			Code:    common.GeneralInternalError,
+			Message: "failed to start transaction",
+		})
+	}
+
+	inci, err := tx.Incident.Query().Where(incident.ID(req.IncidentID)).Select(incident.FieldVoteFilter).Only(ctx.Context())
+	if err != nil {
+		if err := tx.Rollback(); err != nil {
+			i.Logger.Warn().Err(err).Msg("failed to rollback transaction")
+		}
+
+		if ent.IsNotFound(err) {
+			return ctx.Status(fiber.StatusNotFound).JSON(common.ErrorResponse{
+				Code:    "incident:not_found",
+				Message: "incident not found",
+			})
+		}
+		return ctx.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{
+			Code:    common.GeneralInternalError,
+			Message: "failed to query incident",
+		})
+	}
+
+	var g = &bloom.BloomFilter{}
+	if inci.VoteFilter != nil {
+		if _, err := g.ReadFrom(bytes.NewReader(*inci.VoteFilter)); err != nil {
+			if err := tx.Rollback(); err != nil {
+				i.Logger.Warn().Err(err).Msg("failed to rollback transaction")
+			}
+
+			i.Logger.Error().Err(err).Msg("failed to read bloom filter")
+			return ctx.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{
+				Code:    common.GeneralInternalError,
+				Message: "failed to read bloom filter",
+			})
+		}
+	} else {
+		g = bloom.New(1000000, 5)
+	}
+
+	if g.Test(req.UserID[:]) {
+		if err := tx.Rollback(); err != nil {
+			i.Logger.Warn().Err(err).Msg("failed to rollback transaction")
+		}
+
+		return ctx.Status(fiber.StatusConflict).JSON(common.ErrorResponse{
+			Code:    "incident:voted",
+			Message: "already voted",
+		})
+	}
+
+	g.Add(req.UserID[:])
+	var buf bytes.Buffer
+	qb := tx.Incident.UpdateOneID(req.IncidentID)
+	if _, err := g.WriteTo(&buf); err != nil {
+		if err := tx.Rollback(); err != nil {
+			i.Logger.Warn().Err(err).Msg("failed to rollback transaction")
+		}
+
+		i.Logger.Error().Err(err).Msg("failed to write bloom filter")
+		return ctx.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{
+			Code:    common.GeneralInternalError,
+			Message: "failed to write bloom filter",
+		})
+	}
+
+	qb.SetVoteFilter(buf.Bytes())
+	if req.VotePositive {
+		qb.AddVote(1)
+	} else {
+		qb.AddVote(-1)
+	}
+
+	if _, err := qb.Save(ctx.Context()); err != nil {
+		if err := tx.Rollback(); err != nil {
+			i.Logger.Warn().Err(err).Msg("failed to rollback transaction")
+		}
+
+		i.Logger.Error().Err(err).Msg("failed to save vote")
+		return ctx.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{
+			Code:    common.GeneralInternalError,
+			Message: "failed to save vote",
+		})
+	}
+
+	if err := tx.Commit(); err != nil {
+		if err := tx.Rollback(); err != nil {
+			i.Logger.Warn().Err(err).Msg("failed to rollback transaction")
+		}
+
+		i.Logger.Error().Err(err).Msg("failed to commit transaction")
+		return ctx.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{
+			Code:    common.GeneralInternalError,
+			Message: "failed to commit transaction",
+		})
+	}
+
+	return ctx.Status(fiber.StatusNoContent).Send(nil)
 }
 
 type ReportRequest struct {
@@ -393,5 +523,14 @@ type QueryResponse struct {
 	Longitude   schema.Coordinate `json:"longitude"`
 	Type        string            `json:"type"`
 	Description string            `json:"description"`
-	CreatedAt   time.Time         `json:"created_at"`
+
+	Vote int `json:"vote"`
+
+	CreatedAt time.Time `json:"created_at"`
+}
+
+type VoteRequest struct {
+	UserID       uuid.UUID `json:"user_id"`
+	IncidentID   uuid.UUID `json:"incident_id"`
+	VotePositive bool      `json:"vote_positive"`
 }

@@ -23,4 +23,5 @@ func (i *Incident) Route(route *fiber.App, prefix ...string) {
 	r.Get("/image/:incident_id", i.Query)
 	r.Post("/help", i.Help)
 	r.Post("/help/query", i.QueryHelp)
+	r.Post("/incident/vote", i.Vote)
 }

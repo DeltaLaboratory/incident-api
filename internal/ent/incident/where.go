@@ -86,6 +86,16 @@ func Image(v []byte) predicate.Incident {
 	return predicate.Incident(sql.FieldEQ(FieldImage, v))
 }
 
+// Vote applies equality check predicate on the "vote" field. It's identical to VoteEQ.
+func Vote(v int) predicate.Incident {
+	return predicate.Incident(sql.FieldEQ(FieldVote, v))
+}
+
+// VoteFilter applies equality check predicate on the "vote_filter" field. It's identical to VoteFilterEQ.
+func VoteFilter(v []byte) predicate.Incident {
+	return predicate.Incident(sql.FieldEQ(FieldVoteFilter, v))
+}
+
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.Incident {
 	return predicate.Incident(sql.FieldEQ(FieldCreatedAt, v))
@@ -414,6 +424,86 @@ func ImageLT(v []byte) predicate.Incident {
 // ImageLTE applies the LTE predicate on the "image" field.
 func ImageLTE(v []byte) predicate.Incident {
 	return predicate.Incident(sql.FieldLTE(FieldImage, v))
+}
+
+// VoteEQ applies the EQ predicate on the "vote" field.
+func VoteEQ(v int) predicate.Incident {
+	return predicate.Incident(sql.FieldEQ(FieldVote, v))
+}
+
+// VoteNEQ applies the NEQ predicate on the "vote" field.
+func VoteNEQ(v int) predicate.Incident {
+	return predicate.Incident(sql.FieldNEQ(FieldVote, v))
+}
+
+// VoteIn applies the In predicate on the "vote" field.
+func VoteIn(vs ...int) predicate.Incident {
+	return predicate.Incident(sql.FieldIn(FieldVote, vs...))
+}
+
+// VoteNotIn applies the NotIn predicate on the "vote" field.
+func VoteNotIn(vs ...int) predicate.Incident {
+	return predicate.Incident(sql.FieldNotIn(FieldVote, vs...))
+}
+
+// VoteGT applies the GT predicate on the "vote" field.
+func VoteGT(v int) predicate.Incident {
+	return predicate.Incident(sql.FieldGT(FieldVote, v))
+}
+
+// VoteGTE applies the GTE predicate on the "vote" field.
+func VoteGTE(v int) predicate.Incident {
+	return predicate.Incident(sql.FieldGTE(FieldVote, v))
+}
+
+// VoteLT applies the LT predicate on the "vote" field.
+func VoteLT(v int) predicate.Incident {
+	return predicate.Incident(sql.FieldLT(FieldVote, v))
+}
+
+// VoteLTE applies the LTE predicate on the "vote" field.
+func VoteLTE(v int) predicate.Incident {
+	return predicate.Incident(sql.FieldLTE(FieldVote, v))
+}
+
+// VoteFilterEQ applies the EQ predicate on the "vote_filter" field.
+func VoteFilterEQ(v []byte) predicate.Incident {
+	return predicate.Incident(sql.FieldEQ(FieldVoteFilter, v))
+}
+
+// VoteFilterNEQ applies the NEQ predicate on the "vote_filter" field.
+func VoteFilterNEQ(v []byte) predicate.Incident {
+	return predicate.Incident(sql.FieldNEQ(FieldVoteFilter, v))
+}
+
+// VoteFilterIn applies the In predicate on the "vote_filter" field.
+func VoteFilterIn(vs ...[]byte) predicate.Incident {
+	return predicate.Incident(sql.FieldIn(FieldVoteFilter, vs...))
+}
+
+// VoteFilterNotIn applies the NotIn predicate on the "vote_filter" field.
+func VoteFilterNotIn(vs ...[]byte) predicate.Incident {
+	return predicate.Incident(sql.FieldNotIn(FieldVoteFilter, vs...))
+}
+
+// VoteFilterGT applies the GT predicate on the "vote_filter" field.
+func VoteFilterGT(v []byte) predicate.Incident {
+	return predicate.Incident(sql.FieldGT(FieldVoteFilter, v))
+}
+
+// VoteFilterGTE applies the GTE predicate on the "vote_filter" field.
+func VoteFilterGTE(v []byte) predicate.Incident {
+	return predicate.Incident(sql.FieldGTE(FieldVoteFilter, v))
+}
+
+// VoteFilterLT applies the LT predicate on the "vote_filter" field.
+func VoteFilterLT(v []byte) predicate.Incident {
+	return predicate.Incident(sql.FieldLT(FieldVoteFilter, v))
+}
+
+// VoteFilterLTE applies the LTE predicate on the "vote_filter" field.
+func VoteFilterLTE(v []byte) predicate.Incident {
+	return predicate.Incident(sql.FieldLTE(FieldVoteFilter, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.

@@ -104,6 +104,33 @@ func (iu *IncidentUpdate) SetImage(b []byte) *IncidentUpdate {
 	return iu
 }
 
+// SetVote sets the "vote" field.
+func (iu *IncidentUpdate) SetVote(i int) *IncidentUpdate {
+	iu.mutation.ResetVote()
+	iu.mutation.SetVote(i)
+	return iu
+}
+
+// SetNillableVote sets the "vote" field if the given value is not nil.
+func (iu *IncidentUpdate) SetNillableVote(i *int) *IncidentUpdate {
+	if i != nil {
+		iu.SetVote(*i)
+	}
+	return iu
+}
+
+// AddVote adds i to the "vote" field.
+func (iu *IncidentUpdate) AddVote(i int) *IncidentUpdate {
+	iu.mutation.AddVote(i)
+	return iu
+}
+
+// SetVoteFilter sets the "vote_filter" field.
+func (iu *IncidentUpdate) SetVoteFilter(b []byte) *IncidentUpdate {
+	iu.mutation.SetVoteFilter(b)
+	return iu
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (iu *IncidentUpdate) SetCreatedAt(t time.Time) *IncidentUpdate {
 	iu.mutation.SetCreatedAt(t)
@@ -179,6 +206,15 @@ func (iu *IncidentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := iu.mutation.Image(); ok {
 		_spec.SetField(incident.FieldImage, field.TypeBytes, value)
+	}
+	if value, ok := iu.mutation.Vote(); ok {
+		_spec.SetField(incident.FieldVote, field.TypeInt, value)
+	}
+	if value, ok := iu.mutation.AddedVote(); ok {
+		_spec.AddField(incident.FieldVote, field.TypeInt, value)
+	}
+	if value, ok := iu.mutation.VoteFilter(); ok {
+		_spec.SetField(incident.FieldVoteFilter, field.TypeBytes, value)
 	}
 	if value, ok := iu.mutation.CreatedAt(); ok {
 		_spec.SetField(incident.FieldCreatedAt, field.TypeTime, value)
@@ -274,6 +310,33 @@ func (iuo *IncidentUpdateOne) SetNillableDescription(s *string) *IncidentUpdateO
 // SetImage sets the "image" field.
 func (iuo *IncidentUpdateOne) SetImage(b []byte) *IncidentUpdateOne {
 	iuo.mutation.SetImage(b)
+	return iuo
+}
+
+// SetVote sets the "vote" field.
+func (iuo *IncidentUpdateOne) SetVote(i int) *IncidentUpdateOne {
+	iuo.mutation.ResetVote()
+	iuo.mutation.SetVote(i)
+	return iuo
+}
+
+// SetNillableVote sets the "vote" field if the given value is not nil.
+func (iuo *IncidentUpdateOne) SetNillableVote(i *int) *IncidentUpdateOne {
+	if i != nil {
+		iuo.SetVote(*i)
+	}
+	return iuo
+}
+
+// AddVote adds i to the "vote" field.
+func (iuo *IncidentUpdateOne) AddVote(i int) *IncidentUpdateOne {
+	iuo.mutation.AddVote(i)
+	return iuo
+}
+
+// SetVoteFilter sets the "vote_filter" field.
+func (iuo *IncidentUpdateOne) SetVoteFilter(b []byte) *IncidentUpdateOne {
+	iuo.mutation.SetVoteFilter(b)
 	return iuo
 }
 
@@ -382,6 +445,15 @@ func (iuo *IncidentUpdateOne) sqlSave(ctx context.Context) (_node *Incident, err
 	}
 	if value, ok := iuo.mutation.Image(); ok {
 		_spec.SetField(incident.FieldImage, field.TypeBytes, value)
+	}
+	if value, ok := iuo.mutation.Vote(); ok {
+		_spec.SetField(incident.FieldVote, field.TypeInt, value)
+	}
+	if value, ok := iuo.mutation.AddedVote(); ok {
+		_spec.AddField(incident.FieldVote, field.TypeInt, value)
+	}
+	if value, ok := iuo.mutation.VoteFilter(); ok {
+		_spec.SetField(incident.FieldVoteFilter, field.TypeBytes, value)
 	}
 	if value, ok := iuo.mutation.CreatedAt(); ok {
 		_spec.SetField(incident.FieldCreatedAt, field.TypeTime, value)

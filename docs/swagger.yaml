@@ -94,6 +94,8 @@ definitions:
         type: string
       type:
         type: string
+      vote:
+        type: integer
     type: object
   incident.ReportRequest:
     properties:
@@ -119,6 +121,15 @@ definitions:
     properties:
       incident_id:
         type: string
+    type: object
+  incident.VoteRequest:
+    properties:
+      incident_id:
+        type: string
+      user_id:
+        type: string
+      vote_positive:
+        type: boolean
     type: object
 host: incident.deltalab.dev
 info:
@@ -301,6 +312,40 @@ paths:
           schema:
             $ref: '#/definitions/common.ErrorResponse'
       summary: Report an incident
+      tags:
+      - Incident
+  /incident/vote:
+    post:
+      consumes:
+      - application/json
+      description: Vote an incident
+      parameters:
+      - description: Vote request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/incident.VoteRequest'
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+      summary: Vote an incident
       tags:
       - Incident
 schemes:

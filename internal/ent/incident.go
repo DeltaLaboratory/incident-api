@@ -31,6 +31,10 @@ type Incident struct {
 	Description string `json:"description,omitempty"`
 	// Image holds the value of the "image" field.
 	Image *[]byte `json:"image,omitempty"`
+	// Vote holds the value of the "vote" field.
+	Vote int `json:"vote,omitempty"`
+	// VoteFilter holds the value of the "vote_filter" field.
+	VoteFilter *[]byte `json:"vote_filter,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt    time.Time `json:"created_at,omitempty"`
 	selectValues sql.SelectValues
@@ -41,10 +45,12 @@ func (*Incident) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case incident.FieldImage:
+		case incident.FieldImage, incident.FieldVoteFilter:
 			values[i] = new([]byte)
 		case incident.FieldLocation:
 			values[i] = new(schema.GeoJson)
+		case incident.FieldVote:
+			values[i] = new(sql.NullInt64)
 		case incident.FieldIdempotencyKey, incident.FieldType, incident.FieldDescription:
 			values[i] = new(sql.NullString)
 		case incident.FieldCreatedAt:
@@ -108,6 +114,18 @@ func (i *Incident) assignValues(columns []string, values []any) error {
 			} else if value != nil {
 				i.Image = value
 			}
+		case incident.FieldVote:
+			if value, ok := values[j].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field vote", values[j])
+			} else if value.Valid {
+				i.Vote = int(value.Int64)
+			}
+		case incident.FieldVoteFilter:
+			if value, ok := values[j].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field vote_filter", values[j])
+			} else if value != nil {
+				i.VoteFilter = value
+			}
 		case incident.FieldCreatedAt:
 			if value, ok := values[j].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[j])
@@ -167,6 +185,14 @@ func (i *Incident) String() string {
 	builder.WriteString(", ")
 	if v := i.Image; v != nil {
 		builder.WriteString("image=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	builder.WriteString("vote=")
+	builder.WriteString(fmt.Sprintf("%v", i.Vote))
+	builder.WriteString(", ")
+	if v := i.VoteFilter; v != nil {
+		builder.WriteString("vote_filter=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")
