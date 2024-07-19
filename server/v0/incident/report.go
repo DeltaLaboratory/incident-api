@@ -42,7 +42,7 @@ func (i *Incident) Report(ctx *fiber.Ctx) error {
 		})
 	}
 
-	encodedGeo, err := geojson.Encode(geom.NewPoint(geom.XY).MustSetCoords([]float64{float64(req.Latitude), float64(req.Longitude)}))
+	encodedGeo, err := geojson.Encode(geom.NewPoint(geom.XY).MustSetCoords([]float64{float64(req.Latitude), float64(req.Longitude)}).SetSRID(4326))
 	if err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{
 			Code:    common.GeneralInternalError,
