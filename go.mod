@@ -12,7 +12,6 @@ require (
 	github.com/jackc/pgx/v5 v5.6.0
 	github.com/rs/zerolog v1.33.0
 	github.com/swaggo/swag v1.16.3
-	github.com/withuscpa/withuscpa-api v0.1.6
 )
 
 require (

@@ -9,7 +9,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
-	_ "github.com/withuscpa/withuscpa-api/docs"
+	_ "github.com/DeltaLaboratory/incident-api/docs"
 
 	"github.com/DeltaLaboratory/incident-api/internal/config"
 	"github.com/DeltaLaboratory/incident-api/internal/ent"
