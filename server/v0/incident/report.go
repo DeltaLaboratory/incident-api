@@ -168,7 +168,7 @@ func (i *Incident) Query(ctx *fiber.Ctx) error {
 
 		query = query.Where(func(s *sql.Selector) {
 			s.Where(sql.ExprP(fmt.Sprintf(
-				"6371000 * 2 * ASIN(SQRT(POWER(SIN((%f - RADIANS(latitude)) / 2), 2) + COS(%f) * COS(RADIANS(latitude)) * POWER(SIN((%f - RADIANS(longitude)) / 2), 2))) <= ?",
+				"6371000 * 2 * ASIN(SQRT(POWER(SIN((%f - RADIANS(latitude)) / 2), 2) + COS(%f) * COS(RADIANS(latitude)) * POWER(SIN((%f - RADIANS(longitude)) / 2), 2))) <= ?;",
 				lat1, lat1, lon1,
 			), req.Radius))
 		})
