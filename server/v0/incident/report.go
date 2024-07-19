@@ -58,7 +58,7 @@ func (i *Incident) Report(ctx *fiber.Ctx) error {
 	qb.SetDescription(req.Description)
 
 	if req.Image != nil {
-		decoded, err := base64.StdEncoding.DecodeString(*req.Image)
+		decoded, err := base64.URLEncoding.DecodeString(*req.Image)
 		if err != nil {
 			return ctx.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{
 				Code:    common.GeneralBadRequest,
